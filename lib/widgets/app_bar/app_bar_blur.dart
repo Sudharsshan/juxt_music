@@ -14,17 +14,6 @@ class AppBarBlur extends StatelessWidget {
       height: 60,
       child: Stack(
         children: [
-          Positioned(
-            top: 0,
-            right: 0,
-            left: 0,
-            child: SizedBox(
-              height: 50,
-              width: MediaQuery.widthOf(context),
-              child: Container(color: Colors.transparent),
-            ),
-          ),
-
           ClipRRect(
             child: BackdropFilter(
               filter: ImageFilter.blur(
