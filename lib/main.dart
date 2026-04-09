@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:juxt_music/theme/theme_controller.dart';
+import 'package:juxt_music/widgets/app_bar/app_bar_blur.dart';
+import 'package:juxt_music/widgets/glass/glass_anim.dart';
 import 'package:juxt_music/widgets/glass/glass_main.dart';
 
 void main() {
@@ -36,9 +38,82 @@ class MainApp extends StatelessWidget {
           theme: lightTheme,
           darkTheme: darkTheme,
           themeMode: mode,
-          home: Scaffold(body: Center(child: GlassMain())),
+          home: Scaffold(
+            body: Center(
+              child: Stack(
+                alignment: AlignmentGeometry.center,
+                children: [
+                  SizedBox(
+                    width: 800,
+                    height: 600,
+                    child: Flex(
+                      direction: Axis.horizontal,
+                      children: [
+                        Expanded(child: Container(color: Colors.amber)),
+                        Expanded(child: Container(color: Colors.red)),
+                        Expanded(
+                          child: Container(color: Colors.deepPurpleAccent),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const GlassMain(child: Text("Hello Juxt!")),
+
+                      const SizedBox(height: 15),
+
+                      const GlassAnim(
+                        child: Text(
+                          "This is animation. YO! Come and check this out!!",
+                        ),
+                      ),
+
+                      const SizedBox(height: 15),
+
+                      test(context),
+                    ],
+                  ),
+
+                  // App Bar
+                  const Positioned(
+                    top: 0,
+                    right: 0,
+                    left: 0,
+                    child: AppBarBlur(
+                      child: Center(
+                        child: GlassAnim(
+                          child: Text(
+                            "This is animation. YO! Come and check this out!!",
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         );
       },
+    );
+  }
+
+  Widget test(BuildContext context) {
+    return ShaderMask(
+      shaderCallback: (rect) => LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Colors.black, Colors.transparent],
+        stops: [0.45, 1.0],
+      ).createShader(rect),
+      blendMode: BlendMode.dstIn,
+      child: GlassMain(
+        child: Text("Test widget", style: TextStyle(fontSize: 30)),
+      ),
     );
   }
 }
