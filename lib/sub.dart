@@ -26,7 +26,7 @@ class Sub extends StatelessWidget {
             left: 0,
             child: AppBarBlur(
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
 
                 children: [
                   const FrontAndBack(),
@@ -42,6 +42,8 @@ class Sub extends StatelessWidget {
                       ),
                     ),
                   ),
+
+                  const SizedBox(width: 20),
 
                   const Visibility(visible: false, child: FrontAndBack()),
                 ],
