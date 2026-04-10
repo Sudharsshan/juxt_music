@@ -11,7 +11,7 @@ class AppBarBlur extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 60,
+      height: 110,
       child: Stack(
         children: [
           ClipRRect(
@@ -20,7 +20,11 @@ class AppBarBlur extends StatelessWidget {
                 sigmaX: GlassBlurValue.sigmaX,
                 sigmaY: GlassBlurValue.sigmaY,
               ),
-              child: SizedBox(width: MediaQuery.widthOf(context), height: 45),
+              child: Container(
+                width: MediaQuery.widthOf(context),
+                height: 99,
+                color: Theme.of(context).scaffoldBackgroundColor,
+              ),
             ),
           ),
 
