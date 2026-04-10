@@ -20,7 +20,7 @@ class AppBarBlur extends StatelessWidget {
                 sigmaX: GlassBlurValue.sigmaX,
                 sigmaY: GlassBlurValue.sigmaY,
               ),
-              child: SizedBox(width: MediaQuery.widthOf(context), height: 30),
+              child: SizedBox(width: MediaQuery.widthOf(context), height: 45),
             ),
           ),
 
