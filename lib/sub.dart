@@ -3,6 +3,7 @@ import 'package:juxt_music/pages/controller/page_controller_custom.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_blur.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_main.dart';
 import 'package:juxt_music/widgets/app_bar/front_and_back.dart';
+import 'package:juxt_music/widgets/app_bar/icons_map.dart';
 import 'package:juxt_music/widgets/glass/glass_anim.dart';
 
 class Sub extends StatelessWidget {
@@ -38,7 +39,8 @@ class Sub extends StatelessWidget {
                       animationDirection: Axis.horizontal,
                       child: AppBarMain(
                         pageNotifier: pageNotifier,
-                        activePage: pageNotifier.value,
+                        children: IconsMap.barIcons,
+                        requiredWidth: 50, // good value for just icons
                       ),
                     ),
                   ),

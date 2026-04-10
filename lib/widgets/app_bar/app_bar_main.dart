@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:juxt_music/global_var/blur_radius.dart';
-import 'package:juxt_music/widgets/app_bar/icons_map.dart';
 
 class AppBarMain extends StatefulWidget {
   const AppBarMain({
     super.key,
     required this.pageNotifier,
-    required this.activePage,
+    required this.children,
+    required this.requiredWidth,
   });
 
   final ValueNotifier pageNotifier;
-  final int activePage;
+  final Map<dynamic, dynamic> children;
+  final double requiredWidth;
 
   @override
   State<AppBarMain> createState() => _AppBarMainState();
@@ -24,6 +25,8 @@ class _AppBarMainState extends State<AppBarMain>
     super.initState();
   }
 
+  late int activePage = 0;
+
   @override
   void dispose() {
     super.dispose();
@@ -33,28 +36,28 @@ class _AppBarMainState extends State<AppBarMain>
 
   @override
   Widget build(BuildContext context) {
-    final iconLength = IconsMap.barIcons.length;
+    final iconLength = widget.children.length;
 
     return IntrinsicWidth(
       child: Stack(
         children: [
           // sliding background
-          AnimatedAlign(
-            curve: Curves.elasticOut,
-            alignment: Alignment(
-              -1.0 + (widget.activePage * (2.0 / (iconLength - 1))),
-              0,
-            ),
-            duration: const Duration(milliseconds: 300),
-            child: FractionallySizedBox(
-              widthFactor: 1 / iconLength,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 3),
+            child: AnimatedAlign(
+              curve: Curves.elasticInOut,
+              alignment: Alignment(
+                -1.0 + (activePage * (2.0 / (iconLength - 1))),
+                0,
+              ),
+              duration: const Duration(milliseconds: 800),
               child: Container(
+                width: widget.requiredWidth,
+                height: 38,
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
                 decoration: BoxDecoration(
-                  color: Theme.of(
-                    context,
-                  ).textTheme.bodySmall!.color!.withAlpha(40),
+                  color: Colors.white.withAlpha(40),
                   borderRadius: BorderRadius.circular(BlurRadius.radius),
                 ),
               ),
@@ -64,16 +67,21 @@ class _AppBarMainState extends State<AppBarMain>
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
-            children: IconsMap.barIcons.entries.map((entry) {
-              bool isActive = widget.activePage == entry.value;
+            children: widget.children.entries.map((entry) {
+              bool isActive = activePage == entry.value;
+              //print("IconID: ${entry.value} || ActivePage: $activePage");
 
               return Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
-                constraints: BoxConstraints(minWidth: 60),
+                constraints: BoxConstraints(minWidth: 40),
                 child: IconButton(
                   onPressed: () {
-                    widget.pageNotifier.value = entry.value;
+                    setState(() {
+                      widget.pageNotifier.value = entry.value;
+                      activePage = entry.value;
+                      print("Calling page change to: ${entry.value}");
+                    });
                   },
                   icon: FaIcon(
                     entry.key,

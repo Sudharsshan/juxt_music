@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:juxt_music/pages/home_page.dart';
+import 'package:juxt_music/pages/trending_page.dart';
 
 class PageControllerCustom extends StatefulWidget {
   const PageControllerCustom({super.key, required this.pageNotifier});
@@ -19,7 +20,7 @@ class _PageControllerSate extends State<PageControllerCustom> {
 
     _pageController = PageController(initialPage: 0);
 
-    _pageController.addListener(() => changePage(widget.pageNotifier.value));
+    widget.pageNotifier.addListener(changePage);
   }
 
   @override
@@ -28,7 +29,9 @@ class _PageControllerSate extends State<PageControllerCustom> {
     super.dispose();
   }
 
-  void changePage(int page) {
+  void changePage() {
+    final page = widget.pageNotifier.value;
+    print("Page change to : $page");
     _pageController.animateToPage(
       page,
       duration: const Duration(milliseconds: 400),
@@ -47,6 +50,7 @@ class _PageControllerSate extends State<PageControllerCustom> {
         HomePage(),
 
         // trending screen
+        TrendingPage(),
 
         // For you screen
 
