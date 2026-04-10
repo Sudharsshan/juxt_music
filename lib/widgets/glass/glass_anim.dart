@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:juxt_music/widgets/glass/glass_main.dart';
 
 class GlassAnim extends StatefulWidget {
-  const GlassAnim({super.key, required this.child});
+  const GlassAnim({super.key, required this.child, required this.animationDirection});
 
   final Widget child;
+  final Axis animationDirection;
 
   @override
   State<GlassAnim> createState() => _GlassAnimState();

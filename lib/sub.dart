@@ -25,7 +25,13 @@ class Sub extends StatelessWidget {
             left: 0,
             child: AppBarBlur(
               child: Center(
-                child: GlassAnim(child: AppBarMain(pageNotifier: pageNotifier, activePage: pageNotifier.value,)),
+                child: GlassAnim(
+                  animationDirection: Axis.horizontal,
+                  child: AppBarMain(
+                    pageNotifier: pageNotifier,
+                    activePage: pageNotifier.value,
+                  ),
+                ),
               ),
             ),
           ),
