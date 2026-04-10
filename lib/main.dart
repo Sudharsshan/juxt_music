@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:juxt_music/global_var/font_sizes.dart';
+import 'package:juxt_music/pages/controller/page_controller_custom.dart';
 import 'package:juxt_music/theme/theme_controller.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_blur.dart';
 import 'package:juxt_music/widgets/glass/glass_anim.dart';
@@ -20,6 +22,11 @@ class MainApp extends StatelessWidget {
         brightness: Brightness.light,
       ),
       scaffoldBackgroundColor: Colors.white,
+      textTheme: TextTheme(
+        bodyLarge: TextStyle(fontSize: FontSizes.large, color: Colors.black),
+        bodyMedium: TextStyle(fontSize: FontSizes.medium, color: Colors.black),
+        bodySmall: TextStyle(fontSize: FontSizes.small, color: Colors.grey),
+      ),
     );
 
     final darkTheme = ThemeData(
@@ -28,7 +35,12 @@ class MainApp extends StatelessWidget {
         seedColor: Colors.black,
         brightness: Brightness.dark,
       ),
-      scaffoldBackgroundColor: Colors.black,
+      scaffoldBackgroundColor: Colors.black.withAlpha(225),
+      textTheme: TextTheme(
+        bodyLarge: TextStyle(fontSize: FontSizes.large, color: Colors.white),
+        bodyMedium: TextStyle(fontSize: FontSizes.medium, color: Colors.white),
+        bodySmall: TextStyle(fontSize: FontSizes.small, color: Colors.grey),
+      ),
     );
 
     return ValueListenableBuilder<ThemeMode>(
@@ -43,40 +55,8 @@ class MainApp extends StatelessWidget {
               child: Stack(
                 alignment: AlignmentGeometry.center,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: double.infinity,
-                          color: Colors.amber,
-                        ),
-                      ),
-                      Expanded(child: Container(color: Colors.red)),
-                      Expanded(
-                        child: Container(color: Colors.deepPurpleAccent),
-                      ),
-                    ],
-                  ),
-
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const GlassMain(child: Text("Hello Juxt!")),
-
-                      const SizedBox(height: 15),
-
-                      const GlassAnim(
-                        child: Text(
-                          "This is animation. YO! Come and check this out!!",
-                        ),
-                      ),
-
-                      const SizedBox(height: 15),
-
-                      test(context),
-                    ],
-                  ),
+                  // Page controller custom
+                  PageControllerCustom(),
 
                   // App Bar
                   const Positioned(
