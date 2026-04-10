@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:juxt_music/global_var/font_sizes.dart';
-import 'package:juxt_music/pages/controller/page_controller_custom.dart';
+import 'package:juxt_music/sub.dart';
 import 'package:juxt_music/theme/theme_controller.dart';
-import 'package:juxt_music/widgets/app_bar/app_bar_blur.dart';
-import 'package:juxt_music/widgets/glass/glass_anim.dart';
 import 'package:juxt_music/widgets/glass/glass_main.dart';
 
 void main() {
@@ -50,33 +48,7 @@ class MainApp extends StatelessWidget {
           theme: lightTheme,
           darkTheme: darkTheme,
           themeMode: mode,
-          home: Scaffold(
-            body: Center(
-              child: Stack(
-                alignment: AlignmentGeometry.center,
-                children: [
-                  // Page controller custom
-                  PageControllerCustom(),
-
-                  // App Bar
-                  const Positioned(
-                    top: 0,
-                    right: 0,
-                    left: 0,
-                    child: AppBarBlur(
-                      child: Center(
-                        child: GlassAnim(
-                          child: Text(
-                            "This is animation. YO! Come and check this out!!",
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          home: Scaffold(body: Sub()),
         );
       },
     );

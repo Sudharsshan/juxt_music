@@ -1,38 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:juxt_music/pages/home_page.dart';
 
-class PageControllerCustom extends StatefulWidget{
-  const PageControllerCustom({super.key});
+class PageControllerCustom extends StatefulWidget {
+  const PageControllerCustom({super.key, required this.pageNotifier});
+  
+  final ValueNotifier pageNotifier;
 
   @override
   State<PageControllerCustom> createState() => _PageControllerSate();
 }
 
-class _PageControllerSate extends State<PageControllerCustom>{
-
+class _PageControllerSate extends State<PageControllerCustom> {
   late PageController _pageController;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
 
     _pageController = PageController(initialPage: 0);
+
+    _pageController.addListener(() => changePage(widget.pageNotifier.value));
   }
 
   @override
-  void dispose(){
+  void dispose() {
     _pageController.dispose();
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context){
+  void changePage(int page) {
+    _pageController.animateToPage(
+      page,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.ease,
+    );
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return PageView(
+      pageSnapping: true,
+      physics: NeverScrollableScrollPhysics(),
       controller: _pageController,
       children: [
         // main screen
-        HomePage()
+        HomePage(),
 
         // trending screen
 
