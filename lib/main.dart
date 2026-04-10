@@ -43,19 +43,19 @@ class MainApp extends StatelessWidget {
               child: Stack(
                 alignment: AlignmentGeometry.center,
                 children: [
-                  SizedBox(
-                    width: 800,
-                    height: 600,
-                    child: Flex(
-                      direction: Axis.horizontal,
-                      children: [
-                        Expanded(child: Container(color: Colors.amber)),
-                        Expanded(child: Container(color: Colors.red)),
-                        Expanded(
-                          child: Container(color: Colors.deepPurpleAccent),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: double.infinity,
+                          color: Colors.amber,
                         ),
-                      ],
-                    ),
+                      ),
+                      Expanded(child: Container(color: Colors.red)),
+                      Expanded(
+                        child: Container(color: Colors.deepPurpleAccent),
+                      ),
+                    ],
                   ),
 
                   Column(
