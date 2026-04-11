@@ -1,29 +1,48 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:juxt_music/global_var/description_chart.dart';
+import 'package:juxt_music/global_var/links/mood_covers.dart';
+import 'package:juxt_music/models/audius_model.dart';
+// import 'package:juxt_music/models/genre_model.dart';
+import 'package:juxt_music/models/mood/mood_model.dart';
+import 'package:juxt_music/service/gen_description.dart';
+import 'package:juxt_music/widgets/featured_list/featured_main.dart';
 import 'package:juxt_music/widgets/music_box/box_main.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, required this.trackDetails});
 
-  final cover =
-      "https://creatornode2.audius.co/content/baeaaaiqsec2u4tsxabfmc2tzcecd3ewvifjcsfzoxx7ob5pcsmbbznygd6eag/480x480.jpg";
-  final title = "Protohype & Chamrae - Ready to Love";
-  final description =
-      "So excited to present my track \"Ready to Love\" with Charmae! This is a classic melodic dubstep tune that I wanted to bring into the current sound of bass music. Enjoy!\n\n-Protohype & Charmae";
+  final List<AudiusModel> trackDetails;
 
   @override
   Widget build(BuildContext context) {
+    final MoodModel moodModel = MoodModel.fromTrackList(trackDetails);
+    //final GenreModel genreModel = GenreModel.fromTrackList(trackDetails);
+
+    final Map<String, String> moodWithDescription =
+        GenDescription.fillDescription(
+          moodModel.uniqueSortedMoods,
+          DescriptionChart.moodDescriptions,
+        );
+
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: Column(
         children: [
+          // SPACING FOR APP BAR HOVER AT START
           const SizedBox(height: 100),
 
-          Center(
-            child: BoxMain(
-              cover: cover,
-              title: title,
-              description: description,
-            ),
+          // MOOD LIST
+          FeaturedMain(
+            listTitle: "Find Your Mood",
+            featureChildren: moodWithDescription.entries.map((entry) {
+              if(kDebugMode) print("showing mood: ${entry.key}");
+              return BoxMain(
+                cover: MoodCovers.coverArtLinks[entry.key] ?? "",
+                title: entry.key,
+                description: entry.value,
+              );
+            }).toList(),
           ),
         ],
       ),
