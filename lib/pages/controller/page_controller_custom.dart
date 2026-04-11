@@ -1,12 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:juxt_music/models/audius_model.dart';
 import 'package:juxt_music/pages/home_page.dart';
 import 'package:juxt_music/pages/trending_page.dart';
 
 class PageControllerCustom extends StatefulWidget {
-  const PageControllerCustom({super.key, required this.pageNotifier});
-  
+  const PageControllerCustom({
+    super.key,
+    required this.pageNotifier,
+    required this.trackDetails,
+    required this.isDataReady,
+  });
+
   final ValueNotifier pageNotifier;
+  final List<AudiusModel> trackDetails;
+  final bool isDataReady;
 
   @override
   State<PageControllerCustom> createState() => _PageControllerSate();
@@ -49,18 +57,26 @@ class _PageControllerSate extends State<PageControllerCustom> {
       physics: NeverScrollableScrollPhysics(),
       controller: _pageController,
       children: [
-        // main screen
-        HomePage(),
+        // HOME SCREEN
+        widget.isDataReady
+            ? HomePage(trackDetails: widget.trackDetails)
+            : placeHolderForNoData(),
 
-        // trending screen
-        TrendingPage(),
+        // TRENDING SCREEN
+        widget.isDataReady ? TrendingPage() : placeHolderForNoData(),
 
-        // For you screen
+        // FOR YOU SCREEN [[UPDATE LATER]]
+        widget.isDataReady ? placeHolderForNoData() : placeHolderForNoData(),
 
-        // library screen
-
-        // search screen
+        // LIBRARY SCREEN
+        placeHolderForNoData(), // UPDATE LATER
+        // SEARCH SCREEN
+        placeHolderForNoData(), //UPDATE LATER
       ],
     );
+  }
+
+  Widget placeHolderForNoData() {
+    return Center(child: CircularProgressIndicator.adaptive());
   }
 }

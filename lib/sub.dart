@@ -43,10 +43,8 @@ class _SubState extends State<Sub> {
       offset: offsetNotifier.value,
     );
     if (kDebugMode) print("Response Ready.");
-    
-    parseJSON();
 
-    fetchMoodsAndGenre();
+    parseJSON();
 
     setState(() {
       isDetailsReady = true;
@@ -59,16 +57,6 @@ class _SubState extends State<Sub> {
     // if (kDebugMode) print("Track details:\n${trackDetails[0].mood}");
   }
 
-  void fetchMoodsAndGenre(){
-    // MOODS
-    moodModel = MoodModel.fromTrackList(trackDetails);
-    if(kDebugMode) print("Available moods: [${moodModel.uniqueSortedMoods}]");
-
-    // GENRE
-    genreModel = GenreModel.fromTrackList(trackDetails);
-    if(kDebugMode) print("Available Genre: [${genreModel.uniqueSortedGenres}]");
-  }
-
   // if (kDebugMode) print("Response data:\n$response");
 
   @override
@@ -78,7 +66,13 @@ class _SubState extends State<Sub> {
         alignment: AlignmentGeometry.center,
         children: [
           // Page controller custom
-          PageControllerCustom(pageNotifier: pageNotifier),
+          isDetailsReady
+              ? PageControllerCustom(
+                  pageNotifier: pageNotifier,
+                  trackDetails: trackDetails,
+                  isDataReady: isDetailsReady,
+                )
+              : CircularProgressIndicator.adaptive(),
 
           // App Bar
           Positioned(
