@@ -61,53 +61,54 @@ class _SubState extends State<Sub> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Stack(
-        alignment: AlignmentGeometry.center,
-        children: [
-          // Page controller custom
-          isDetailsReady
-              ? PageControllerCustom(
-                  pageNotifier: pageNotifier,
-                  trackDetails: trackDetails,
-                  isDataReady: isDetailsReady,
-                )
-              : CircularProgressIndicator.adaptive(),
-
-          // App Bar
-          Positioned(
-            top: 0,
-            right: 0,
-            left: 0,
-            child: AppBarBlur(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
-                children: [
-                  const FrontAndBack(),
-
-                  const SizedBox(width: 20),
-
-                  Center(
-                    child: GlassAnim(
-                      animationDirection: Axis.horizontal,
-                      child: AppBarMain(
-                        pageNotifier: pageNotifier,
-                        children: IconsMap.barIcons,
-                        requiredWidth: 50, // good value for just icons
-                      ),
+    return Stack(
+      alignment: AlignmentGeometry.center,
+      children: [
+        // Page controller custom
+        isDetailsReady
+            ? PageControllerCustom(
+                pageNotifier: pageNotifier,
+                trackDetails: trackDetails,
+                isDataReady: isDetailsReady,
+              )
+            : CircularProgressIndicator.adaptive(),
+    
+        // App Bar
+        Positioned(
+          top: 0,
+          right: 0,
+          left: 0,
+          child: AppBarBlur(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const FrontAndBack(),
+    
+                const SizedBox(width: 20),
+    
+                Flexible(
+                  child: GlassAnim(
+                    animationDirection: Axis.horizontal,
+                    child: AppBarMain(
+                      pageNotifier: pageNotifier,
+                      children: IconsMap.barIcons,
+                      requiredWidth: 50, // good value for just icons
                     ),
                   ),
-
-                  const SizedBox(width: 20),
-
-                  const Visibility(visible: false, child: FrontAndBack()),
-                ],
-              ),
+                ),
+    
+                const SizedBox(width: 20),
+    
+                const Opacity(
+                  opacity: 0,
+                  child: IgnorePointer(child: const FrontAndBack()),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
