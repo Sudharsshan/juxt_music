@@ -5,7 +5,6 @@ class GenreModel {
 
   GenreModel({required this.genres});
 
-  /// Factory: Extracts genre strings from the parsed AudiusModel list
   factory GenreModel.fromTrackList(List<AudiusModel> tracks) {
     final List<String> extractedGenres = tracks
         .map((track) => track.genre.trim())
@@ -15,14 +14,13 @@ class GenreModel {
     return GenreModel(genres: extractedGenres);
   }
 
-  /// Alphabetically sorted unique genres for the sidebar/dropdown
+  /// USE THIS: Removes duplicates and sorts A-Z
   List<String> get uniqueSortedGenres {
     final unique = genres.toSet().toList();
     unique.sort();
     return unique;
   }
 
-  /// Static filter to return only tracks matching the selected genre
   static List<AudiusModel> filterByGenre(
     List<AudiusModel> tracks,
     String targetGenre,
