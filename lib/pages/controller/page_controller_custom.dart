@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:juxt_music/pages/home_page.dart';
 import 'package:juxt_music/pages/trending_page.dart';
@@ -31,7 +32,9 @@ class _PageControllerSate extends State<PageControllerCustom> {
 
   void changePage() {
     final page = widget.pageNotifier.value;
-    print("Page change to : $page");
+    if (kDebugMode) {
+      print("Page change to : $page");
+    }
     _pageController.animateToPage(
       page,
       duration: const Duration(milliseconds: 400),

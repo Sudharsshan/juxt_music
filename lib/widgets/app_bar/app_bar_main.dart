@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:juxt_music/global_var/blur_radius.dart';
@@ -27,10 +28,6 @@ class _AppBarMainState extends State<AppBarMain>
 
   late int activePage = 0;
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   void handlePageChange(int buttonID) {}
 
@@ -80,7 +77,9 @@ class _AppBarMainState extends State<AppBarMain>
                     setState(() {
                       widget.pageNotifier.value = entry.value;
                       activePage = entry.value;
-                      print("Calling page change to: ${entry.value}");
+                      if (kDebugMode) {
+                        print("Calling page change to: ${entry.value}");
+                      }
                     });
                   },
                   icon: FaIcon(
