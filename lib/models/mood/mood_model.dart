@@ -5,22 +5,20 @@ class MoodModel {
 
   MoodModel({required this.moods});
 
-  /// Updated Factory: Now accepts the already parsed List of AudiusModels
+  /// Factory: Extracts mood strings from the already parsed AudiusModel list
   factory MoodModel.fromTrackList(List<AudiusModel> tracks) {
     final List<String> extractedMoods = tracks
-        .map(
-          (track) => track.mood,
-        ) // Pull the 'mood' field from your AudiusModel
-        .where((mood) => mood.isNotEmpty) // Filter out empty strings
+        .map((track) => track.mood)
+        .where((mood) => mood.isNotEmpty && mood != 'None')
         .toList();
 
     return MoodModel(moods: extractedMoods);
   }
 
-  /// Returns unique moods for a cleaner UI list
+  /// Unique moods for UI chips/filters
   List<String> get uniqueMoods => moods.toSet().toList();
 
-  /// Pass the main list and the target mood string (e.g., "Energizing")
+  /// Static filter to return only tracks matching the selected mood
   static List<AudiusModel> filterByMood(
     List<AudiusModel> tracks,
     String targetMood,
@@ -29,19 +27,15 @@ class MoodModel {
   }
 }
 
-// // Example usage:
+// // Updated Usage Logic:
 // void main() {
-//   // String responseBody = await apiCall(); 
-//   String responseBody = '''{
-//     "data": [
-//         {"track_id": 1892405197, "mood": "Energizing"},
-//         {"track_id": 804078527, "mood": "Sensual"},
-//         {"track_id": 238349420, "mood": "Defiant"}
-//     ]
-//   }''';
-
-//   final model = MoodModel.fromJson(responseBody);
-  
-//   print("All Moods: \${model.moods}");
-//   print("Unique Moods: \${model.uniqueMoods}");
+//   // 1. Fetch data via AudiusTrendingService -> returns List<dynamic>
+//   // 2. Map to AudiusModel -> List<AudiusModel> allTracks = rawData.map((m) => AudiusModel.fromJson(m)).toList();
+//
+//   // 3. Extract moods for the UI:
+//   // final moodModel = MoodModel.fromTrackList(allTracks);
+//   // print("Unique Moods for UI: ${moodModel.uniqueMoods}");
+//
+//   // 4. Filter tracks when a user selects a mood:
+//   // List<AudiusModel> happyTracks = MoodModel.filterByMood(allTracks, "Energizing");
 // }
