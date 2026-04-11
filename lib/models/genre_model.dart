@@ -5,8 +5,7 @@ class GenreModel {
 
   GenreModel({required this.genres});
 
-  /// Updated Factory: Now accepts the already parsed List of AudiusModels
-  /// This prevents decoding the same JSON string multiple times.
+  /// Factory: Extracts genre strings from the parsed AudiusModel list
   factory GenreModel.fromTrackList(List<AudiusModel> tracks) {
     final List<String> extractedGenres = tracks
         .map((track) => track.genre.trim())
@@ -16,28 +15,31 @@ class GenreModel {
     return GenreModel(genres: extractedGenres);
   }
 
-  /// NEW: Static filter function to return specific tracks
-  static List<AudiusModel> filterByGenre(List<AudiusModel> tracks, String targetGenre) {
-    return tracks.where((track) => track.genre == targetGenre).toList();
-  }
-
-  /// Returns unique genres sorted alphabetically for easy UI categorization
+  /// Alphabetically sorted unique genres for the sidebar/dropdown
   List<String> get uniqueSortedGenres {
     final unique = genres.toSet().toList();
     unique.sort();
     return unique;
   }
+
+  /// Static filter to return only tracks matching the selected genre
+  static List<AudiusModel> filterByGenre(
+    List<AudiusModel> tracks,
+    String targetGenre,
+  ) {
+    return tracks.where((track) => track.genre == targetGenre).toList();
+  }
 }
 
-// // Quick Test Execution (Updated for Logic Understanding)
+// // Updated Usage Logic:
 // void main() {
-//   // Instead of a raw String, you now pass your List<AudiusModel>
-//   // List<AudiusModel> myTracks = ... obtained from your service
+//   // Use your master list of AudiusModels obtained from your trending service
+//   // List<AudiusModel> allTracks = ...
 //
-//   final genreData = GenreModel.fromTrackList(myTracks);
-//   
-//   print("Unique Genres found: ${genreData.uniqueSortedGenres}");
+//   // 1. Get genres for categorization:
+//   // final genreModel = GenreModel.fromTrackList(allTracks);
+//   // print("Sorted Genres: ${genreModel.uniqueSortedGenres}");
 //
-//   // To filter the UI when a user clicks 'Dubstep':
-//   // List<AudiusModel> dubstepOnly = GenreModel.filterByGenre(myTracks, 'Dubstep');
+//   // 2. Filter tracks when a user selects a genre:
+//   // List<AudiusModel> loFiTracks = GenreModel.filterByGenre(allTracks, "Lo-Fi");
 // }
