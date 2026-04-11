@@ -5,20 +5,22 @@ class MoodModel {
 
   MoodModel({required this.moods});
 
-  /// Factory: Extracts mood strings from the already parsed AudiusModel list
   factory MoodModel.fromTrackList(List<AudiusModel> tracks) {
     final List<String> extractedMoods = tracks
-        .map((track) => track.mood)
+        .map((track) => track.mood.trim())
         .where((mood) => mood.isNotEmpty && mood != 'None')
         .toList();
 
     return MoodModel(moods: extractedMoods);
   }
 
-  /// Unique moods for UI chips/filters
-  List<String> get uniqueMoods => moods.toSet().toList();
+  /// USE THIS: Removes duplicates and sorts A-Z
+  List<String> get uniqueSortedMoods {
+    final unique = moods.toSet().toList();
+    unique.sort();
+    return unique;
+  }
 
-  /// Static filter to return only tracks matching the selected mood
   static List<AudiusModel> filterByMood(
     List<AudiusModel> tracks,
     String targetMood,
