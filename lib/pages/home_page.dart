@@ -44,6 +44,8 @@ class HomePage extends StatelessWidget {
               );
             }).toList(),
           ),
+
+          const SizedBox(height: 1000), // spacing to test AppBar render
         ],
       ),
     );
