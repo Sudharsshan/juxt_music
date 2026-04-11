@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:juxt_music/global_var/page_routes.dart';
+import 'package:juxt_music/global_var/navigation/page_routes.dart';
 
 class RouteNavigator {
   const RouteNavigator({required this.pageNotifier});

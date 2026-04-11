@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:juxt_music/global_var/api_constants.dart';
+import 'package:juxt_music/global_var/links/api_constants.dart';
 
 class TrendingService {
   final String apiEndpoint = ApiConstants.apiEndpoint;
