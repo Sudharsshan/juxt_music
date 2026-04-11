@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:juxt_music/models/audius_model.dart';
+import 'package:juxt_music/models/genre_model.dart';
+import 'package:juxt_music/models/mood/mood_model.dart';
 import 'package:juxt_music/pages/controller/page_controller_custom.dart';
 import 'package:juxt_music/service/trending_service.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_blur.dart';
@@ -23,6 +25,8 @@ class _SubState extends State<Sub> {
   late List<dynamic> response;
   late List<AudiusModel> trackDetails;
   bool isDetailsReady = false;
+  late MoodModel moodModel;
+  late GenreModel genreModel;
 
   @override
   void initState() {
@@ -42,6 +46,8 @@ class _SubState extends State<Sub> {
     
     parseJSON();
 
+    fetchMoodsAndGenre();
+
     setState(() {
       isDetailsReady = true;
     });
@@ -50,7 +56,17 @@ class _SubState extends State<Sub> {
   void parseJSON() async {
     // parse the JSON data obtained from API
     trackDetails = response.map((json) => AudiusModel.fromJson(json)).toList();
-    if (kDebugMode) print("Track details:\n${trackDetails[0].mood}");
+    // if (kDebugMode) print("Track details:\n${trackDetails[0].mood}");
+  }
+
+  void fetchMoodsAndGenre(){
+    // MOODS
+    moodModel = MoodModel.fromTrackList(trackDetails);
+    if(kDebugMode) print("Available moods: [${moodModel.uniqueSortedMoods}]");
+
+    // GENRE
+    genreModel = GenreModel.fromTrackList(trackDetails);
+    if(kDebugMode) print("Available Genre: [${genreModel.uniqueSortedGenres}]");
   }
 
   // if (kDebugMode) print("Response data:\n$response");
