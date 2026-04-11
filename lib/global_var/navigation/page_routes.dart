@@ -1,4 +1,4 @@
-import 'package:juxt_music/global_var/page_id.dart';
+import 'package:juxt_music/global_var/navigation/page_id.dart';
 
 class PageRoutes {
 
