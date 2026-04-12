@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:juxt_music/global_var/track_box_height.dart';
 import 'package:juxt_music/widgets/cover_art/cover_box_main.dart';
@@ -10,61 +9,74 @@ class BoxMain extends StatelessWidget {
     required this.title,
     required this.description,
     this.isNetwork = false,
+    required this.onTap
   });
+
+  // This class creates the main track boxes displayed on home screen and across UI
+  // This is a sub-class of featured main widget which builds a row of this widget
+  // It requires:
+  // cover (path to image)
+  // title & description (String data)
+  // isNetwork (to load local assets or network assets)
+  // onTap (for handling navigation function when user taps on this specific widget)
 
   final String cover;
   final String title, description;
   final bool isNetwork;
+  final Function onTap;
 
   final double width = 170;
 
   @override
   Widget build(BuildContext context) {
-    if (kDebugMode) print("Cover ID: $title path: $cover");
+    // if (kDebugMode) print("Cover ID: $title path: $cover");
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: SizedBox(
-        width: width,
-        height: TrackBoxHeight.height,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // COVER
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: SizedBox(
-                height: 170,
-                width: 170,
-                child: CoverBoxMain(imagePath: cover, isNetwork: isNetwork),
+      child: GestureDetector(
+        onTap: () => onTap,
+        child: SizedBox(
+          width: width,
+          height: TrackBoxHeight.height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // COVER
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: SizedBox(
+                  height: 170,
+                  width: 170,
+                  child: CoverBoxMain(imagePath: cover, isNetwork: isNetwork),
+                ),
               ),
-            ),
-
-            const SizedBox(height: 3),
-
-            // TITLE
-            Padding(
-              padding: EdgeInsetsGeometry.symmetric(horizontal: 5),
-              child: Text(
-                title,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall!.copyWith(color: Colors.white),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+        
+              const SizedBox(height: 3),
+        
+              // TITLE
+              Padding(
+                padding: EdgeInsetsGeometry.symmetric(horizontal: 5),
+                child: Text(
+                  title,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall!.copyWith(color: Colors.white),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-
-            // DESCRIPTION
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
-              child: Text(
-                description,
-                style: Theme.of(context).textTheme.bodySmall,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 3,
+        
+              // DESCRIPTION
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: Text(
+                  description,
+                  style: Theme.of(context).textTheme.bodySmall,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 3,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

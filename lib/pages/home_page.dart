@@ -41,6 +41,9 @@ class HomePage extends StatelessWidget {
                 cover: MoodCovers.coverArtLinks[entry.key] ?? "",
                 title: entry.key,
                 description: entry.value,
+                onTap: () {
+                  
+                },
               );
             }).toList(),
           ),
