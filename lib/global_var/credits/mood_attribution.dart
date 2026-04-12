@@ -15,6 +15,8 @@ class MoodAttribution {
     'Sensual' : 'Photo by Zhu Yunxiao on Unsplash',
     'Sentimental' : 'Photo by Nicholas Ng on Unsplash',
     'Stirring' : 'Photo by S H A R EE Q A on Unsplash',
-    'Upbeat' : 'Photo by Ahmed Zayan on Unsplash'
+    'Upbeat' : 'Photo by Ahmed Zayan on Unsplash',
+    'Melancholy' : 'Photo by Tiziano Brignoli on Unsplash',
+    'Mood' : 'Photo by Peter Schad on Unsplash',
   };
 }

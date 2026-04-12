@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:juxt_music/global_var/links/mood_covers.dart';
 
 class CoverBoxMain extends StatelessWidget {
   const CoverBoxMain({
@@ -10,8 +11,10 @@ class CoverBoxMain extends StatelessWidget {
     required this.isNetwork,
   });
 
-  final String imagePath, placeHolder = "lib/assets/mood_covers/Aggressive.jpg";
+  final String imagePath;
   final bool isNetwork;
+
+  static final placeHolder = MoodCovers.coverArtLinks['Mood']!;
 
   @override
   Widget build(BuildContext context) {

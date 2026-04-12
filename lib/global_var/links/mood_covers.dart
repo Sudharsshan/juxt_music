@@ -9,6 +9,8 @@ class MoodCovers {
   'Excited': 'lib/assets/mood_covers/Excited.jpg',
   'Fiery': 'lib/assets/mood_covers/Fiery.jpg',
   'Gritty': 'lib/assets/mood_covers/Gritty.jpg',
+  'Melancholy' : 'lib/assets/mood_covers/Melancholy.jpg',
+  'Mood' : 'lib/assets/mood_covers/Mood.jpg',
   'Peaceful': 'lib/assets/mood_covers/Peaceful.jpg',
   'Romantic': 'lib/assets/mood_covers/Romantic.jpg',
   'Rowdy': 'lib/assets/mood_covers/Rowdy.jpg',

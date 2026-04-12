@@ -8,6 +8,7 @@ class DescriptionChart {
     'Excited': 'High-octane tracks for the peak moments.',
     'Fiery': 'Intense, passionate, and ready to burn.',
     'Gritty': 'Raw, unpolished, and street-hardened.',
+    'Melancholy' : 'Sad songs that understand exactly how you feel',
     'Peaceful': 'Silence the noise. Find your center.',
     'Romantic': 'For the late nights and the heartbeat.',
     'Rowdy': 'Loud, messy, and unapologetic.',
