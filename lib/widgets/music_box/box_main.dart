@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:juxt_music/global_var/glass_blur_value.dart';
 import 'package:juxt_music/global_var/track_box_height.dart';
 
 class BoxMain extends StatelessWidget {
@@ -20,7 +23,7 @@ class BoxMain extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if(kDebugMode) print("Cover ID: $title path: $cover");
+    if (kDebugMode) print("Cover ID: $title path: $cover");
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: SizedBox(
@@ -35,14 +38,12 @@ class BoxMain extends StatelessWidget {
               child: SizedBox(
                 height: 170,
                 width: 170,
-                child: isNetwork
-                    ? Image.network(cover, fit: BoxFit.fill)
-                    : Image.asset(cover!=""? cover : placeHolder, fit: BoxFit.fill),
+                child: fillEmptyArea(cover, isNetwork),
               ),
             ),
-      
+
             const SizedBox(height: 3),
-      
+
             // TITLE
             Padding(
               padding: EdgeInsetsGeometry.symmetric(horizontal: 5),
@@ -55,7 +56,7 @@ class BoxMain extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-      
+
             // DESCRIPTION
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -69,6 +70,54 @@ class BoxMain extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget fillEmptyArea(String imagePath, bool isNetwork) {
+    Widget buildImage(BoxFit fit) {
+      return isNetwork
+          ? Image.network(
+              imagePath,
+              fit: fit,
+              // Error builder to handle broken links gracefully
+              errorBuilder: (context, error, stackTrace) =>
+                  Image.asset(placeHolder, fit: fit),
+            )
+          : Image.asset(
+              imagePath.isNotEmpty ? imagePath : placeHolder,
+              fit: fit,
+            );
+    }
+
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // 1. BLURRED BACKDROP (The "Safety Net")
+        Positioned.fill(child: buildImage(BoxFit.cover)),
+        Positioned.fill(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(color: Colors.black.withAlpha(50)),
+          ),
+        ),
+
+        // 2. MAIN IMAGE (The "Hero")
+        // Changing this to cover fixes the "contain" behavior
+        Positioned.fill(child: buildImage(BoxFit.cover)),
+
+        // 3. OPTIONAL: Subtle Inner Shadow to give depth
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.white.withAlpha(25),
+                width: 0.5,
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
