@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:juxt_music/global_var/track_box_height.dart';
 import 'package:juxt_music/widgets/cover_art/cover_box_main.dart';
 
+/// Creates the main track boxes displayed on the home screen and throughout the UI.
+///
+/// This is a sub-widget typically used within a horizontal scrollable row
+/// to showcase featured tracks, albums, or artists.
 class BoxMain extends StatelessWidget {
   const BoxMain({
     super.key,
@@ -9,16 +13,16 @@ class BoxMain extends StatelessWidget {
     required this.title,
     required this.description,
     this.isNetwork = false,
-    required this.onTap
+    required this.onTap,
   });
 
-  // This class creates the main track boxes displayed on home screen and across UI
-  // This is a sub-class of featured main widget which builds a row of this widget
-  // It requires:
-  // cover (path to image)
-  // title & description (String data)
-  // isNetwork (to load local assets or network assets)
-  // onTap (for handling navigation function when user taps on this specific widget)
+  /// Construct a [BoxMain] widget.
+  ///
+  /// * [cover]: The image path (Network URL or Asset path).
+  /// * [title]: The primary name of the track or album.
+  /// * [description]: Secondary text, usually the artist name or genre.
+  /// * [isNetwork]: Set to `true` if [cover] is a URL.
+  /// * [onTap]: Callback function triggered when the box is pressed.
 
   final String cover;
   final String title, description;
@@ -33,7 +37,7 @@ class BoxMain extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: GestureDetector(
-        onTap: () => onTap,
+        onTap: () => onTap(),
         child: SizedBox(
           width: width,
           height: TrackBoxHeight.height,
@@ -49,9 +53,9 @@ class BoxMain extends StatelessWidget {
                   child: CoverBoxMain(imagePath: cover, isNetwork: isNetwork),
                 ),
               ),
-        
+
               const SizedBox(height: 3),
-        
+
               // TITLE
               Padding(
                 padding: EdgeInsetsGeometry.symmetric(horizontal: 5),
@@ -64,7 +68,7 @@ class BoxMain extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-        
+
               // DESCRIPTION
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5),
