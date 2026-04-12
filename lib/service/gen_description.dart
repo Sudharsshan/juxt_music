@@ -9,7 +9,7 @@ class GenDescription {
     Map<String, String> theirDescriptions,
   ) {
     return {
-      for (var key in moodOrGenre) key: theirDescriptions[key] ?? "",
+      for (var key in moodOrGenre) key: theirDescriptions[key] ?? "Feel your inner $key",
     };
   }
 }
