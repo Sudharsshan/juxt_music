@@ -11,6 +11,10 @@ class CoverBoxMain extends StatelessWidget {
     required this.isNetwork,
   });
 
+  // This class returns a widget for cover artwork. 
+  // Utilizes cached network image for storage images in cache
+  // ALso supports local image loading using assetImage
+
   final String imagePath;
   final bool isNetwork;
 
