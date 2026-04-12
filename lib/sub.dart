@@ -23,7 +23,7 @@ class _SubState extends State<Sub> {
   int limit = 50;
   ValueNotifier<int> offsetNotifier = ValueNotifier(0);
   late List<dynamic> response;
-  late List<AudiusModel> trackDetails;
+  List<AudiusModel> trackDetails = [];
   bool isDetailsReady = false;
   late MoodModel moodModel;
   late GenreModel genreModel;
@@ -65,14 +65,11 @@ class _SubState extends State<Sub> {
       alignment: AlignmentGeometry.center,
       children: [
         // Page controller custom
-        isDetailsReady
-            ? PageControllerCustom(
-                pageNotifier: pageNotifier,
-                trackDetails: trackDetails,
-                isDataReady: isDetailsReady,
-              )
-            : CircularProgressIndicator.adaptive(),
-    
+        PageControllerCustom(
+          pageNotifier: pageNotifier,
+          trackDetails: trackDetails,
+          isDataReady: isDetailsReady,
+        ),
         // App Bar
         Positioned(
           top: 0,
@@ -84,9 +81,9 @@ class _SubState extends State<Sub> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const FrontAndBack(),
-    
+
                 const SizedBox(width: 20),
-    
+
                 Flexible(
                   child: GlassAnim(
                     animationDirection: Axis.horizontal,
@@ -97,12 +94,12 @@ class _SubState extends State<Sub> {
                     ),
                   ),
                 ),
-    
+
                 const SizedBox(width: 20),
-    
+
                 const Opacity(
                   opacity: 0,
-                  child: IgnorePointer(child: const FrontAndBack()),
+                  child: IgnorePointer(child: FrontAndBack()),
                 ),
               ],
             ),
