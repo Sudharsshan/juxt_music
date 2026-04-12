@@ -1,8 +1,7 @@
 import 'dart:ui';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:juxt_music/global_var/glass_blur_value.dart';
 import 'package:juxt_music/global_var/track_box_height.dart';
 
 class BoxMain extends StatelessWidget {
@@ -75,19 +74,32 @@ class BoxMain extends StatelessWidget {
 
   Widget fillEmptyArea(String imagePath, bool isNetwork) {
     Widget buildImage(BoxFit fit) {
-      return isNetwork
-          ? Image.network(
-              imagePath,
-              fit: fit,
-              // Error builder to handle broken links gracefully
-              errorBuilder: (context, error, stackTrace) =>
-                  Image.asset(placeHolder, fit: fit),
-            )
-          : Image.asset(
-              imagePath.isNotEmpty ? imagePath : placeHolder,
-              fit: fit,
-            );
-    }
+  if (!isNetwork) {
+    return Image.asset(
+      imagePath.isNotEmpty ? imagePath : placeHolder,
+      fit: fit,
+    );
+  }
+
+  return CachedNetworkImage(
+    imageUrl: imagePath,
+    fit: fit,
+    // This is the app-wide cache manager. 
+    // It automatically remembers this image across different screens.
+    placeholder: (context, url) => Container(
+      color: Colors.grey[900],
+      child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+    ),
+    errorWidget: (context, url, error) => Image.asset(
+      placeHolder,
+      fit: fit,
+    ),
+    // Optimization: Tell the cache to resize the image in memory 
+    // so a 1080p image doesn't lag a 170x170 list item.
+    memCacheHeight: 400, 
+    memCacheWidth: 400,
+  );
+}
 
     return Stack(
       alignment: Alignment.center,
