@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:juxt_music/global_var/font_sizes.dart';
 import 'package:juxt_music/sub.dart';
@@ -6,6 +7,16 @@ import 'package:juxt_music/widgets/glass/glass_main.dart';
 
 void main() {
   runApp(const MainApp());
+}
+
+class AppScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.stylus,
+    PointerDeviceKind.unknown,
+  };
 }
 
 class MainApp extends StatelessWidget {
@@ -45,6 +56,8 @@ class MainApp extends StatelessWidget {
       valueListenable: ThemeController.themeMode,
       builder: (context, mode, child) {
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          scrollBehavior: AppScrollBehavior(),
           theme: lightTheme,
           darkTheme: darkTheme,
           themeMode: mode,
