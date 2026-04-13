@@ -76,34 +76,37 @@ class _SubState extends State<Sub> {
           right: 0,
           left: 0,
           child: AppBarBlur(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-
-                const SizedBox(width: 5,),
-
-                const FrontAndBack(),
-
-                const SizedBox(width: 15),
-
-                GlassAnim(
-                  animationDirection: Axis.horizontal,
-                  child: AppBarMain(
-                    pageNotifier: pageNotifier,
-                    children: IconsMap.barIcons,
-                    requiredWidth: 50, // good value for just icons
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+              
+                  const SizedBox(width: 5,),
+              
+                  const FrontAndBack(),
+              
+                  const SizedBox(width: 15),
+              
+                  GlassAnim(
+                    animationDirection: Axis.horizontal,
+                    child: AppBarMain(
+                      pageNotifier: pageNotifier,
+                      children: IconsMap.barIcons,
+                      requiredWidth: 50, // good value for just icons
+                    ),
                   ),
-                ),
-
-                const SizedBox(width: 20),
-
-                const Opacity(
-                  opacity: 0,
-                  child: IgnorePointer(child: FrontAndBack()),
-                ),
-              ],
+              
+                  const SizedBox(width: 20),
+              
+                  const Opacity(
+                    opacity: 0,
+                    child: IgnorePointer(child: FrontAndBack()),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
