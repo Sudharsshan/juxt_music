@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:juxt_music/global_var/description_chart.dart';
 import 'package:juxt_music/global_var/links/mood_covers.dart';
 import 'package:juxt_music/models/audius_model.dart';
-// import 'package:juxt_music/models/genre_model.dart';
+import 'package:juxt_music/models/genre_model.dart';
 import 'package:juxt_music/models/mood/mood_model.dart';
 import 'package:juxt_music/service/gen_description.dart';
 import 'package:juxt_music/widgets/featured_list/featured_main.dart';
@@ -17,7 +17,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final MoodModel moodModel = MoodModel.fromTrackList(trackDetails);
-    //final GenreModel genreModel = GenreModel.fromTrackList(trackDetails);
+    final GenreModel genreModel = GenreModel.fromTrackList(trackDetails);
 
     final Map<String, String> moodWithDescription =
         GenDescription.fillDescription(
@@ -33,7 +33,7 @@ class HomePage extends StatelessWidget {
           children: [
             // SPACING FOR APP BAR HOVER AT START
             const SizedBox(height: 100),
-      
+
             // MOOD LIST
             FeaturedMain(
               listTitle: "Find Your Mood",
@@ -47,8 +47,26 @@ class HomePage extends StatelessWidget {
                 );
               }).toList(),
             ),
-      
-            const SizedBox(height: 1000), // spacing to test AppBar render
+
+            // List of tracks based on Genre
+            ListView.builder(
+              itemCount: genreModel.uniqueSortedGenres.length,
+
+              itemBuilder: (context, index) {
+                final List<AudiusModel> genreFilteredTracks =
+                    GenreModel.filterByGenre(
+                      trackDetails,
+                      genreModel.uniqueSortedGenres[index],
+                    );
+
+                return FeaturedMain(
+                  listTitle: genreModel.uniqueSortedGenres[index],
+                  featureChildren: [
+                    SizedBox(height: genreFilteredTracks.length as double),
+                  ],
+                );
+              },
+            ),
           ],
         ),
       ),
