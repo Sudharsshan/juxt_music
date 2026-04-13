@@ -25,31 +25,32 @@ class HomePage extends StatelessWidget {
           DescriptionChart.moodDescriptions,
         );
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: Column(
-        children: [
-          // SPACING FOR APP BAR HOVER AT START
-          const SizedBox(height: 100),
-
-          // MOOD LIST
-          FeaturedMain(
-            listTitle: "Find Your Mood",
-            featureChildren: moodWithDescription.entries.map((entry) {
-              if(kDebugMode) print("showing mood: ${entry.key}");
-              return BoxMain(
-                cover: MoodCovers.coverArtLinks[entry.key] ?? "",
-                title: entry.key,
-                description: entry.value,
-                onTap: () {
-                  
-                },
-              );
-            }).toList(),
-          ),
-
-          const SizedBox(height: 1000), // spacing to test AppBar render
-        ],
+    return SafeArea(
+      bottom: false,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: [
+            // SPACING FOR APP BAR HOVER AT START
+            const SizedBox(height: 100),
+      
+            // MOOD LIST
+            FeaturedMain(
+              listTitle: "Find Your Mood",
+              featureChildren: moodWithDescription.entries.map((entry) {
+                if (kDebugMode) print("showing mood: ${entry.key}");
+                return BoxMain(
+                  cover: MoodCovers.coverArtLinks[entry.key] ?? "",
+                  title: entry.key,
+                  description: entry.value,
+                  onTap: () {},
+                );
+              }).toList(),
+            ),
+      
+            const SizedBox(height: 1000), // spacing to test AppBar render
+          ],
+        ),
       ),
     );
   }

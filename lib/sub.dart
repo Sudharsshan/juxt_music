@@ -78,13 +78,15 @@ class _SubState extends State<Sub> {
           child: AppBarBlur(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const FrontAndBack(),
 
                 const SizedBox(width: 20),
 
-                Flexible(
+                SizedBox(
+                  height: 50,
                   child: GlassAnim(
                     animationDirection: Axis.horizontal,
                     child: AppBarMain(
