@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gradient_blur/gradient_blur.dart';
-import 'package:juxt_music/global_var/glass_blur_value.dart';
 
 class AppBarBlur extends StatelessWidget {
   const AppBarBlur({super.key, required this.child});
@@ -9,23 +8,42 @@ class AppBarBlur extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 99,
-      child: GradientBlur(
-        maxBlur: GlassBlurValue.sigmaX + GlassBlurValue.sigmaY / 2,
-        minBlur: 0,
-        slices: 20, // DEFAULT
-        gradient: LinearGradient(
-          colors: [
-            Theme.of(context).scaffoldBackgroundColor.withAlpha(10),
-            Colors.transparent,
-          ],
-        ),
-        child: Column(
+    const double actualHeight = 99.0, overScanHeight = actualHeight + 11;
+    return ClipRRect(
+      child: Container(
+        color: Theme.of(context).textTheme.bodyLarge!.color!.withAlpha(25),
+        height: actualHeight,
+        child: Stack(
           children: [
-            const SizedBox(height: 20,),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              height: overScanHeight,
+              child: GradientBlur(
+                maxBlur: 12,
+                minBlur: 0,
+                slices: 20, // MORE BLUURRR
+                edgeBlur: null,
+                curve: Curves.linear,
+                gradient: LinearGradient(
+                  begin: AlignmentGeometry.topCenter,
+                  end: AlignmentGeometry.bottomCenter,
+                  colors: [
+                    Theme.of(context).scaffoldBackgroundColor.withAlpha(102),
+                    Colors.transparent,
+                  ],
+                  stops: const [0.0, 0.8],
+                ),
+                child: const SizedBox.shrink(),
+              ),
+            ),
 
-            child
+            SafeArea(
+              child: Center(
+                child: Column(children: [const SizedBox(height: 20), child]),
+              ),
+            ),
           ],
         ),
       ),

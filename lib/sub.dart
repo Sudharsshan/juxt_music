@@ -81,19 +81,19 @@ class _SubState extends State<Sub> {
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+
+                const SizedBox(width: 5,),
+
                 const FrontAndBack(),
 
-                const SizedBox(width: 20),
+                const SizedBox(width: 15),
 
-                SizedBox(
-                  height: 50,
-                  child: GlassAnim(
-                    animationDirection: Axis.horizontal,
-                    child: AppBarMain(
-                      pageNotifier: pageNotifier,
-                      children: IconsMap.barIcons,
-                      requiredWidth: 50, // good value for just icons
-                    ),
+                GlassAnim(
+                  animationDirection: Axis.horizontal,
+                  child: AppBarMain(
+                    pageNotifier: pageNotifier,
+                    children: IconsMap.barIcons,
+                    requiredWidth: 50, // good value for just icons
                   ),
                 ),
 
