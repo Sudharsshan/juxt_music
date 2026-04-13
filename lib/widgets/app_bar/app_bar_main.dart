@@ -42,7 +42,7 @@ class _AppBarMainState extends State<AppBarMain>
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 3),
             child: AnimatedAlign(
-              curve: Curves.elasticInOut,
+              curve: Curves.elasticOut,
               alignment: Alignment(
                 -1.0 + (activePage * (2.0 / (iconLength - 1))),
                 0,
