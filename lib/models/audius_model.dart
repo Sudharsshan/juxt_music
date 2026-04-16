@@ -18,6 +18,9 @@ class AudiusModel {
   // ARTWORK HANDLING
   final Map<String, dynamic>? _artworkSizes;
 
+  /// A list of base API provider mirrors (e.g., https://audius-dp.host.com)
+  final List<String> streamMirrors;
+
   AudiusModel({
     required this.id,
     required this.trackId,
@@ -30,10 +33,14 @@ class AudiusModel {
     required this.plays,
     required this.reposts,
     required this.uploadDate,
+    required this.streamMirrors,
     Map<String, dynamic>? artworkSizes,
   }) : _artworkSizes = artworkSizes;
 
-  factory AudiusModel.fromJson(Map<String, dynamic> json) {
+  factory AudiusModel.fromJson(
+    Map<String, dynamic> json,
+    List<String> mirrors,
+  ) {
     // Date Parsing
     String rawDate = json['updated_at'] ?? json['release_date'] ?? "";
     String formattedDate = rawDate.isNotEmpty
@@ -55,6 +62,7 @@ class AudiusModel {
       plays: json['play_count'] ?? 0,
       uploadDate: formattedDate,
       artworkSizes: json['artwork'],
+      streamMirrors: mirrors,
     );
   }
 
@@ -62,6 +70,13 @@ class AudiusModel {
   String? getArtwork(ArtworkSize size) {
     if (_artworkSizes == null) return null;
     return _artworkSizes[size.key];
+  }
+
+  /// Returns the full stream URL for a specific mirror index
+  String getStreamUrl(int mirrorIndex) {
+    if (mirrorIndex < 0 || mirrorIndex >= streamMirrors.length) return '';
+    // Audius Stream endpoint format: v1/tracks/{track_id}/stream
+    return '${streamMirrors[mirrorIndex]}/v1/tracks/$id/stream';
   }
 }
 
