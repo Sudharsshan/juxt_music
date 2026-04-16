@@ -61,7 +61,7 @@ class AudiusModel {
   // Updated code to use Enum for type safe
   String? getArtwork(ArtworkSize size) {
     if (_artworkSizes == null) return null;
-    return _artworkSizes![size.key];
+    return _artworkSizes[size.key];
   }
 }
 
