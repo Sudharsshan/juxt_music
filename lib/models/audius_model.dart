@@ -1,3 +1,5 @@
+import 'package:juxt_music/global_var/artwork_sizesa/size_chart.dart';
+
 class AudiusModel {
   final String id;
   final int trackId; // Integer ID for internal sorting/logic
@@ -56,10 +58,10 @@ class AudiusModel {
     );
   }
 
-  String? getArtwork(int size) {
+  // Updated code to use Enum for type safe
+  String? getArtwork(ArtworkSize size) {
     if (_artworkSizes == null) return null;
-    String key = "${size}x$size";
-    return _artworkSizes[key];
+    return _artworkSizes![size.key];
   }
 }
 

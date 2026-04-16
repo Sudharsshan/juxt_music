@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:juxt_music/global_var/artwork_sizesa/size_chart.dart';
 import 'package:juxt_music/global_var/description_chart.dart';
 import 'package:juxt_music/global_var/links/mood_covers.dart';
 import 'package:juxt_music/models/audius_model.dart';
@@ -63,9 +64,7 @@ class HomePage extends StatelessWidget {
                 // List of tracks for each specific genre filtered
                 return FeaturedMain(
                   listTitle: genreModel.uniqueSortedGenres[index],
-                  listPage: () {
-                    
-                  },
+                  listPage: () {},
                   featureChildren: [
                     ListView.builder(
                       itemCount: genreFilteredTracks.length,
@@ -76,9 +75,10 @@ class HomePage extends StatelessWidget {
                           cursor: SystemMouseCursors.click,
                           child: BoxMain(
                             cover: genreFilteredTracks[key].getArtwork(
-                              480,
+                              ArtworkSize.small,
                             )!, // track artwork
-                            title: genreFilteredTracks[key].title, // track title
+                            title:
+                                genreFilteredTracks[key].title, // track title
                             description: genreFilteredTracks[key]
                                 .artist, // For music tracks, i display artists
                             onTap:
