@@ -13,7 +13,7 @@ import 'package:juxt_music/widgets/app_bar/icons_map.dart';
 import 'package:juxt_music/widgets/glass/glass_anim.dart';
 
 /// The sub main class which is an extension of [main.dart] class
-/// this holds the main widget functionality of maintaining 
+/// this holds the main widget functionality of maintaining
 /// * - [Notifiers] such as scroll, page, offset
 /// - Also holds key functions for fetching & populating main fields
 class Sub extends StatefulWidget {
@@ -43,7 +43,7 @@ class _SubState extends State<Sub> {
   /// This [updateTrends] function fetches the list of tracks, their entire details
   /// from the [Audius] server and populates them using the function [parseJSON]
   /// Once the details are ready, it sets the bool [isDetailsReady] as TRUE
-  /// So that all the children widgets are notified as data is ready and 
+  /// So that all the children widgets are notified as data is ready and
   /// can utilize the available data to build their required widgets.
   void updateTrends() async {
     // obtain the JSON data from api
@@ -52,7 +52,7 @@ class _SubState extends State<Sub> {
       limit: limit,
       offset: offsetNotifier.value,
     );
-    if (kDebugMode) print("Response Ready.");
+    if (kDebugMode) print("Response Ready. \n${response.length}");
 
     parseJSON();
 

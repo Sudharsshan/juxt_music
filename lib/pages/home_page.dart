@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:juxt_music/global_var/artwork_sizesa/size_chart.dart';
+import 'package:juxt_music/global_var/artwork_sizes/artwork_sizes.dart';
 import 'package:juxt_music/global_var/description_chart.dart';
 import 'package:juxt_music/global_var/links/mood_covers.dart';
 import 'package:juxt_music/models/audius_model.dart';

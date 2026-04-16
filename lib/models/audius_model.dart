@@ -1,4 +1,4 @@
-import 'package:juxt_music/global_var/artwork_sizesa/size_chart.dart';
+import 'package:juxt_music/global_var/artwork_sizes/artwork_sizes.dart';
 
 class AudiusModel {
   final String id;
