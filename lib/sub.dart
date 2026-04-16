@@ -11,6 +11,7 @@ import 'package:juxt_music/widgets/app_bar/app_bar_main.dart';
 import 'package:juxt_music/widgets/app_bar/front_and_back.dart';
 import 'package:juxt_music/widgets/app_bar/icons_map.dart';
 import 'package:juxt_music/widgets/glass/glass_anim.dart';
+import 'package:juxt_music/widgets/music_player/music_player_main.dart';
 
 /// The sub main class which is an extension of [main.dart] class
 /// this holds the main widget functionality of maintaining
@@ -77,6 +78,9 @@ class _SubState extends State<Sub> {
 
   // if (kDebugMode) print("Response data:\n$response");
 
+  /// Function [playThisTrack] takes the [AudiusModel] of the track the user
+  /// selects and then updates the global variable 
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -127,6 +131,16 @@ class _SubState extends State<Sub> {
             ),
           ),
         ),
+
+        // Music Player widget
+        Positioned(
+          top: 0,
+          right: 0,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: MusicPlayerMain(trackDetails: trackDetails)
+          ),
+        )
       ],
     );
   }
