@@ -72,16 +72,19 @@ class HomePage extends StatelessWidget {
                       scrollDirection: Axis.horizontal,
                       shrinkWrap: true,
                       itemBuilder: (context, key) {
-                        return BoxMain(
-                          cover: genreFilteredTracks[key].getArtwork(
-                            480,
-                          )!, // track artwork
-                          title: genreFilteredTracks[key].title, // track title
-                          description: genreFilteredTracks[key]
-                              .artist, // For music tracks, i display artists
-                          onTap:
-                              () {}, // should build a navigation or pop-up to open the track in big mode and play
-                          isNetwork: true,
+                        return MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: BoxMain(
+                            cover: genreFilteredTracks[key].getArtwork(
+                              480,
+                            )!, // track artwork
+                            title: genreFilteredTracks[key].title, // track title
+                            description: genreFilteredTracks[key]
+                                .artist, // For music tracks, i display artists
+                            onTap:
+                                () {}, // should build a navigation or pop-up to open the track in big mode and play
+                            isNetwork: true,
+                          ),
                         );
                       },
                     ),
