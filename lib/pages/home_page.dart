@@ -43,15 +43,16 @@ class HomePage extends StatelessWidget {
                   cover: MoodCovers.coverArtLinks[entry.key] ?? "",
                   title: entry.key,
                   description: entry.value,
-                  onTap: () {},
+                  onTap:
+                      () {}, // TO-DO: Update the on tap to a specific screen with list of tracks matching the mood selected.
                 );
               }).toList(),
             ),
 
-            // List of tracks based on Genre
+            // List of Genre using builder
             ListView.builder(
               itemCount: genreModel.uniqueSortedGenres.length,
-
+              shrinkWrap: true,
               itemBuilder: (context, index) {
                 final List<AudiusModel> genreFilteredTracks =
                     GenreModel.filterByGenre(
@@ -59,10 +60,31 @@ class HomePage extends StatelessWidget {
                       genreModel.uniqueSortedGenres[index],
                     );
 
+                // List of tracks for each specific genre filtered
                 return FeaturedMain(
                   listTitle: genreModel.uniqueSortedGenres[index],
+                  listPage: () {
+                    
+                  },
                   featureChildren: [
-                    SizedBox(height: genreFilteredTracks.length as double),
+                    ListView.builder(
+                      itemCount: genreFilteredTracks.length,
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      itemBuilder: (context, key) {
+                        return BoxMain(
+                          cover: genreFilteredTracks[key].getArtwork(
+                            480,
+                          )!, // track artwork
+                          title: genreFilteredTracks[key].title, // track title
+                          description: genreFilteredTracks[key]
+                              .artist, // For music tracks, i display artists
+                          onTap:
+                              () {}, // should build a navigation or pop-up to open the track in big mode and play
+                          isNetwork: true,
+                        );
+                      },
+                    ),
                   ],
                 );
               },
