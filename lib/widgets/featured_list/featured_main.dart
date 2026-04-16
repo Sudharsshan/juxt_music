@@ -23,19 +23,23 @@ class FeaturedMain extends StatelessWidget {
           padding: const EdgeInsets.symmetric(
             horizontal: 16,
           ), // Match card spacing
-          child: GestureDetector(
-            onTap: () => launchFeaturePage(listPage),
-            child: Row(
-              children: [
-                Text(listTitle, style: Theme.of(context).textTheme.bodyMedium),
-                const SizedBox(width: 12),
-                if (listPage != null)
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    size: 16, // Keep it proportional
-                    color: Theme.of(context).textTheme.bodySmall!.color,
-                  ),
-              ],
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => launchFeaturePage(listPage),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(listTitle, style: Theme.of(context).textTheme.bodyMedium),
+                  const SizedBox(width: 12),
+                  if (listPage != null)
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16, // Keep it proportional
+                      color: Theme.of(context).textTheme.bodySmall!.color,
+                    ),
+                ],
+              ),
             ),
           ),
         ),
