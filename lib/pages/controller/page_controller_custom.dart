@@ -10,11 +10,15 @@ class PageControllerCustom extends StatefulWidget {
     required this.pageNotifier,
     required this.trackDetails,
     required this.isDataReady,
+    required this.currentTrack,
   });
 
   final ValueNotifier pageNotifier;
   final List<AudiusModel> trackDetails;
   final bool isDataReady;
+
+  /// A notifier variable to notify the currently selected track
+  final ValueNotifier<AudiusModel?> currentTrack;
 
   @override
   State<PageControllerCustom> createState() => _PageControllerSate();
@@ -59,7 +63,10 @@ class _PageControllerSate extends State<PageControllerCustom> {
       children: [
         // HOME SCREEN
         widget.isDataReady
-            ? HomePage(trackDetails: widget.trackDetails)
+            ? HomePage(
+                trackDetails: widget.trackDetails,
+                selectedTrack: widget.currentTrack,
+              )
             : placeHolderForNoData(),
 
         // TRENDING SCREEN

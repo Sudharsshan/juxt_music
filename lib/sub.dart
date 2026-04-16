@@ -34,6 +34,11 @@ class _SubState extends State<Sub> {
   late MoodModel moodModel;
   late GenreModel genreModel;
 
+  /// selected track to play
+  ValueNotifier<AudiusModel?> trackSelected = ValueNotifier<AudiusModel?>(
+    null,
+  ); // defaulted to a random value
+
   @override
   void initState() {
     super.initState();
@@ -79,7 +84,7 @@ class _SubState extends State<Sub> {
   // if (kDebugMode) print("Response data:\n$response");
 
   /// Function [playThisTrack] takes the [AudiusModel] of the track the user
-  /// selects and then updates the global variable 
+  /// selects and then updates the global variable
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +96,7 @@ class _SubState extends State<Sub> {
           pageNotifier: pageNotifier,
           trackDetails: trackDetails,
           isDataReady: isDetailsReady,
+          currentTrack: trackSelected,
         ),
         // App Bar
         Positioned(
@@ -136,11 +142,18 @@ class _SubState extends State<Sub> {
         Positioned(
           top: 0,
           right: 0,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: MusicPlayerMain(trackDetails: trackDetails)
+          child: ValueListenableBuilder(
+            valueListenable: trackSelected,
+            builder: (context, track, child) {
+              if (track == null) return SizedBox.shrink();
+
+              return Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: MusicPlayerMain(trackDetails: trackSelected.value!),
+              );
+            },
           ),
-        )
+        ),
       ],
     );
   }

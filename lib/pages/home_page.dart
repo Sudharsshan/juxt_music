@@ -10,10 +10,27 @@ import 'package:juxt_music/service/gen_description.dart';
 import 'package:juxt_music/widgets/featured_list/featured_main.dart';
 import 'package:juxt_music/widgets/music_box/box_main.dart';
 
+/// Main [HomePage] widget that returns the widgets that fill the landing page
+/// of the app.
+/// Uses a [SingleChildScrollView] with multiple [ListView.builder]
+/// for showing the tracks, genre, etc.
 class HomePage extends StatelessWidget {
-  const HomePage({super.key, required this.trackDetails});
+  const HomePage({
+    super.key,
+    required this.trackDetails,
+    required this.selectedTrack,
+  });
 
+  /// An [AudiusModel] variable to hold the track details to show
   final List<AudiusModel> trackDetails;
+
+  /// A [AudiusModel] variable to hold the currently selected track to play
+  final ValueNotifier<AudiusModel?> selectedTrack;
+
+  /// Function updates the [ValueNotifier] variable with the selected track ID
+  void updateCurrentTrack(AudiusModel track) {
+    selectedTrack.value = track;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,9 +97,12 @@ class HomePage extends StatelessWidget {
                             title:
                                 genreFilteredTracks[key].title, // track title
                             description: genreFilteredTracks[key]
-                                .artist, // For music tracks, i display artists
-                            onTap:
-                                () {}, // should build a navigation or pop-up to open the track in big mode and play
+                                .artist, // For track description, i display artists
+                            onTap: () {
+                              updateCurrentTrack(
+                                genreFilteredTracks[key],
+                              );
+                            }, // should build a navigation or pop-up to open the track in big mode and play
                             isNetwork: true,
                           ),
                         );
