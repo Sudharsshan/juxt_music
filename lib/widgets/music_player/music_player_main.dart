@@ -131,7 +131,7 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
                       ),
                       Flexible(
                         flex: 3,
-                        child: Container(color: imageColorScheme!.surface),
+                        child: Container(color: imageColorScheme?.surface),
                       ),
                     ],
                   )
@@ -148,7 +148,7 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
                       ),
                       Flexible(
                         flex: 1,
-                        child: Container(color: imageColorScheme!.surface),
+                        child: Container(color: imageColorScheme?.surface),
                       ),
                     ],
                   ),
@@ -183,6 +183,8 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
           // Top App bar
           Positioned(
             top: 0,
+            left: 0,
+            right: 0,
             child: AppBarBlur(
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
