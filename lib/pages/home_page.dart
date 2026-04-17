@@ -43,6 +43,9 @@ class HomePage extends StatelessWidget {
           DescriptionChart.moodDescriptions,
         );
 
+    if (kDebugMode)
+      print('Mood genre length: ${moodModel.uniqueSortedMoods.length}');
+
     return SafeArea(
       bottom: false,
       child: SingleChildScrollView(
@@ -69,6 +72,7 @@ class HomePage extends StatelessWidget {
 
             // List of Genre using builder
             ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: genreModel.uniqueSortedGenres.length,
               shrinkWrap: true,
               itemBuilder: (context, index) {
@@ -99,9 +103,7 @@ class HomePage extends StatelessWidget {
                             description: genreFilteredTracks[key]
                                 .artist, // For track description, i display artists
                             onTap: () {
-                              updateCurrentTrack(
-                                genreFilteredTracks[key],
-                              );
+                              updateCurrentTrack(genreFilteredTracks[key]);
                             }, // should build a navigation or pop-up to open the track in big mode and play
                             isNetwork: true,
                           ),
