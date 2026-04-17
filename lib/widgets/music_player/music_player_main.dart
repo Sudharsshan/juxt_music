@@ -40,6 +40,9 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
   /// [bool] to hold value of track is playing or not.
   bool isPlaying = false;
 
+  /// [bool] to ensure color scheme is ready before widgets are drawn
+  bool isColorSchemeReady = false;
+
   @override
   void initState() {
     super.initState();
@@ -49,6 +52,14 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
     _pageController = PageController(initialPage: pageNotifier.value);
 
     pageNotifier.addListener(changePage);
+
+    // if (mounted) {
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     setState(() {
+    //       isColorSchemeReady = true;
+    //     });
+    //   });
+    // }
   }
 
   /// Function to change the page
@@ -77,6 +88,7 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
     if (mounted) {
       setState(() {
         imageColorScheme = newScheme;
+        isColorSchemeReady = true;
       });
     }
   }
@@ -216,6 +228,10 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
   }
 
   Widget backgroundBuilder(bool isFullScreen, Widget backgroundImage) {
+    if (!isColorSchemeReady) {
+      return Container();
+    }
+
     if (isFullScreen) {
       return Positioned.fill(top: 0, left: 0, child: backgroundImage);
     } else {
