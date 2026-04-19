@@ -51,7 +51,7 @@ class _SubState extends State<Sub> {
   /// Once the details are ready, it sets the bool [isDetailsReady] as TRUE
   /// So that all the children widgets are notified as data is ready and
   /// can utilize the available data to build their required widgets.
-  void updateTrends() async {
+  Future<void> updateTrends() async {
     // obtain the JSON data from api
     TrendingService trendingService = TrendingService();
     response = await trendingService.fetchTrendingTracks(
@@ -60,7 +60,9 @@ class _SubState extends State<Sub> {
     );
     if (kDebugMode) print("Response Ready. \n${response.length}");
 
-    parseJSON();
+    await parseJSON();
+
+    if(!mounted) return;
 
     setState(() {
       isDetailsReady = true;
@@ -71,7 +73,7 @@ class _SubState extends State<Sub> {
   /// from [Audius] server and stores it into a global variable called
   /// [trackDetails] as [List<String> trackDetails]
   /// This function also fetches the mirror links as a [List<String> nodes]
-  void parseJSON() async {
+  Future<void> parseJSON() async {
     // fetch a list of active nodes which can stream data or music
     final List<String> nodes = await FetchLiveNodes().fetchHealthyMirrors();
     // parse the JSON data obtained from API
