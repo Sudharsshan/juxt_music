@@ -43,8 +43,9 @@ class HomePage extends StatelessWidget {
           DescriptionChart.moodDescriptions,
         );
 
-    if (kDebugMode)
+    if (kDebugMode) {
       print('Mood genre length: ${moodModel.uniqueSortedMoods.length}');
+    }
 
     return SafeArea(
       bottom: false,
