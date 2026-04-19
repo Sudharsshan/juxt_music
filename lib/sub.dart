@@ -151,7 +151,7 @@ class _SubState extends State<Sub> {
 
               return Padding(
                 padding: const EdgeInsets.all(12.0),
-                child: MusicPlayerMain(trackDetails: trackSelected.value!),
+                child: MusicPlayerMain(trackDetails: track),
               );
             },
           ),

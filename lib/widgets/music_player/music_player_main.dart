@@ -43,23 +43,44 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
   /// [bool] to ensure color scheme is ready before widgets are drawn
   bool isColorSchemeReady = false;
 
+  String? _lastPaletteKey;
+  int _paletteRequestId = 0;
+
   @override
   void initState() {
     super.initState();
 
-    updateColorScheme();
-
     _pageController = PageController(initialPage: pageNotifier.value);
 
     pageNotifier.addListener(changePage);
+  }
 
-    // if (mounted) {
-    //   WidgetsBinding.instance.addPostFrameCallback((_) {
-    //     setState(() {
-    //       isColorSchemeReady = true;
-    //     });
-    //   });
-    // }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final paletteKey = _paletteKeyFor(widget.trackDetails);
+    if (_lastPaletteKey != paletteKey) {
+      _lastPaletteKey = paletteKey;
+      updateColorScheme();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant MusicPlayerMain oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final oldKey = _paletteKeyFor(oldWidget.trackDetails);
+    final newKey = _paletteKeyFor(widget.trackDetails);
+
+    if (oldKey != newKey) {
+      _lastPaletteKey = newKey;
+      setState(() {
+        imageColorScheme = null;
+        isColorSchemeReady = false;
+      });
+      updateColorScheme();
+    }
   }
 
   /// Function to change the page
@@ -75,19 +96,27 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
 
   /// Function to update the color scheme of the current track's artwork
   Future<void> updateColorScheme() async {
-    final NetworkImage provider = NetworkImage(
-      widget.trackDetails.getArtwork(ArtworkSize.large)!,
-    );
+    final int requestId = ++_paletteRequestId;
+    final brightness = MediaQuery.platformBrightnessOf(context);
+    final ImageProvider provider = _artworkProvider(widget.trackDetails);
 
-    /// Generate a scheme based on the seed color of the image
-    final ColorScheme newScheme = await ColorScheme.fromImageProvider(
-      provider: provider,
-      brightness: MediaQuery.of(context).platformBrightness,
-    );
+    try {
+      final ColorScheme newScheme = await ColorScheme.fromImageProvider(
+        provider: provider,
+        brightness: brightness,
+      );
 
-    if (mounted) {
+      if (!mounted || requestId != _paletteRequestId) return;
+
       setState(() {
         imageColorScheme = newScheme;
+        isColorSchemeReady = true;
+      });
+    } catch (_) {
+      if (!mounted || requestId != _paletteRequestId) return;
+
+      setState(() {
+        imageColorScheme = Theme.of(context).colorScheme;
         isColorSchemeReady = true;
       });
     }
@@ -100,144 +129,168 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
     });
   }
 
+  String _paletteKeyFor(AudiusModel track) {
+    return '${track.id}|${_resolveArtworkPath(track)}|${MediaQuery.platformBrightnessOf(context).name}';
+  }
+
+  String _resolveArtworkPath(AudiusModel track) {
+    return track.getArtwork(ArtworkSize.large) ??
+        track.getArtwork(ArtworkSize.medium) ??
+        track.getArtwork(ArtworkSize.small) ??
+        CoverBoxMain.placeHolder;
+  }
+
+  bool _isNetworkArtwork(AudiusModel track) {
+    return _resolveArtworkPath(track).startsWith('http');
+  }
+
+  ImageProvider _artworkProvider(AudiusModel track) {
+    final path = _resolveArtworkPath(track);
+    if (_isNetworkArtwork(track)) {
+      return NetworkImage(path);
+    }
+    return AssetImage(path);
+  }
+
+  @override
+  void dispose() {
+    pageNotifier.removeListener(changePage);
+    _pageController.dispose();
+    pageNotifier.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.sizeOf(context).height,
-      width: musicPlayerFullScreen ? MediaQuery.sizeOf(context).width : 400,
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Theme.of(context).textTheme.bodyLarge!.color!.withAlpha(40),
+    final artworkPath = _resolveArtworkPath(widget.trackDetails);
+    final isNetworkArtwork = _isNetworkArtwork(widget.trackDetails);
+    final activeColorScheme = imageColorScheme ?? Theme.of(context).colorScheme;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(BlurRadius.radius),
+      child: Container(
+        height: MediaQuery.sizeOf(context).height - 24, // Padding space 
+        width: musicPlayerFullScreen ? MediaQuery.sizeOf(context).width : 400,
+        decoration: BoxDecoration(
+          border: Border.all(
+            width: 2,
+            color: Theme.of(context).textTheme.bodyLarge!.color!.withAlpha(102),
+          ),
+          borderRadius: BorderRadius.circular(BlurRadius.radius),
         ),
-        borderRadius: BorderRadius.circular(BlurRadius.radius),
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Background image
-          backgroundBuilder(
-            musicPlayerFullScreen,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Background image
             musicPlayerFullScreen
                 ? Row(
                     children: [
                       Flexible(
                         flex: 1,
                         child: CoverBoxMain(
-                          imagePath: widget.trackDetails.getArtwork(
-                            ArtworkSize.large,
-                          )!,
-                          isNetwork: true,
+                          imagePath: artworkPath,
+                          isNetwork: isNetworkArtwork,
                         ),
                       ),
                       Flexible(
                         flex: 3,
-                        child: Container(color: imageColorScheme?.surface),
+                        child: Container(color: activeColorScheme.primary),
                       ),
                     ],
                   )
                 : Column(
                     children: [
                       Flexible(
-                        flex: 1,
+                        flex: 5,
                         child: CoverBoxMain(
-                          imagePath: widget.trackDetails.getArtwork(
-                            ArtworkSize.large,
-                          )!,
-                          isNetwork: true,
+                          imagePath: artworkPath,
+                          isNetwork: isNetworkArtwork,
                         ),
                       ),
                       Flexible(
-                        flex: 1,
-                        child: Container(color: imageColorScheme?.surface),
+                        flex: 4,
+                        child: Container(color: activeColorScheme.primary),
                       ),
                     ],
                   ),
-          ),
-
-          // the player UI (note made only for small view first)
-          musicPlayerFullScreen
-              ? PageView(
-                  controller: _pageController,
-                  children: [
-                    // The lyrics page
-                    LyricPage(),
-
-                    // the music control page
-                    ControlPage(
-                      currentPosition: 0,
-                      totalDuration: 0.00,
-                      isPlaying: isPlaying,
-                      title: widget.trackDetails.title,
-                      artist: widget.trackDetails.artist,
-                      playPause: () {},
-                      nextTrack: () {},
-                      prevTrack: () {},
-                      likeTrack: () {},
-                    ),
-
-                    // the queue page
-                  ],
-                )
-              : Row(),
-
-          // Top App bar
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: AppBarBlur(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(width: 5),
-
-                    IconButton(
-                      onPressed: updateMusicPlayerState,
-                      icon: const FaIcon(FontAwesomeIcons.chevronDown),
-                    ),
-
-                    const SizedBox(width: 15),
-
-                    GlassAnim(
-                      animationDirection: Axis.horizontal,
-                      child: AppBarMain(
-                        pageNotifier: pageNotifier,
-                        children: MusicPlayerIconMap.musicPlayerIcons,
-                        requiredWidth: 50,
+      
+            // the player UI (note made only for small view first)
+            musicPlayerFullScreen
+                ? PageView(
+                    controller: _pageController,
+                    children: [
+                      // The lyrics page
+                      LyricPage(),
+      
+                      // the music control page
+                      ControlPage(
+                        currentPosition: 0,
+                        totalDuration: 0.00,
+                        isPlaying: isPlaying,
+                        title: widget.trackDetails.title,
+                        artist: widget.trackDetails.artist,
+                        playPause: () {},
+                        nextTrack: () {},
+                        prevTrack: () {},
+                        likeTrack: () {},
                       ),
-                    ),
-
-                    const SizedBox(width: 15),
-
-                    const Opacity(
-                      opacity: 0,
-                      child: IgnorePointer(
-                        child: FaIcon(FontAwesomeIcons.chevronDown),
+      
+                      // the queue page
+                    ],
+                  )
+                : Row(),
+      
+            // Top App bar
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: AppBarBlur(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(width: 5),
+              
+                      IconButton(
+                        onPressed: updateMusicPlayerState,
+                        icon: const FaIcon(FontAwesomeIcons.chevronDown),
                       ),
-                    ),
-                  ],
+              
+                      const SizedBox(width: 15),
+              
+                      GlassAnim(
+                        animationDirection: Axis.horizontal,
+                        child: AppBarMain(
+                          pageNotifier: pageNotifier,
+                          children: MusicPlayerIconMap.musicPlayerIcons,
+                          requiredWidth: 50,
+                        ),
+                      ),
+              
+                      const SizedBox(width: 15),
+              
+                      const Opacity(
+                        opacity: 0,
+                        child: IgnorePointer(
+                          child: FaIcon(FontAwesomeIcons.chevronDown),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget backgroundBuilder(bool isFullScreen, Widget backgroundImage) {
-    if (!isColorSchemeReady) {
-      return Container();
-    }
-
-    if (isFullScreen) {
-      return Positioned.fill(top: 0, left: 0, child: backgroundImage);
-    } else {
-      return Positioned(top: 0, left: 0, child: backgroundImage);
-    }
+    return Positioned(child: backgroundImage);
   }
 }

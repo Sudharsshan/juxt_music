@@ -40,6 +40,20 @@ class ControlPage extends StatelessWidget {
         Flexible(
           flex: 1,
           child: GradientBlur(
+            maxBlur: 12,
+            minBlur: 0,
+            slices: 20,
+            edgeBlur: null,
+            curve: Curves.linear,
+            gradient: LinearGradient(
+              begin: AlignmentGeometry.topCenter,
+              end: AlignmentGeometry.bottomCenter,
+              colors: [
+                Theme.of(context).scaffoldBackgroundColor.withAlpha(102),
+                Colors.transparent,
+              ],
+              stops: const [0.0, 0.8],
+            ),
             child: Column(
               children: [
                 // Featured artist SECTION COMMING SOON
@@ -58,8 +72,10 @@ class ControlPage extends StatelessWidget {
 
   Widget infoRow(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             // Title and Artist text
             Text(

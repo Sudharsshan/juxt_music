@@ -10,6 +10,6 @@ class LyricPage extends StatefulWidget {
 class _LyricPageState extends State<LyricPage> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return const Center(child: Text('Lyric page'),);
   }
 }
