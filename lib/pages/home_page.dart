@@ -43,6 +43,9 @@ class HomePage extends StatelessWidget {
           DescriptionChart.moodDescriptions,
         );
 
+    if (kDebugMode)
+      print('Mood genre length: ${moodModel.uniqueSortedMoods.length}');
+
     return SafeArea(
       bottom: false,
       child: SingleChildScrollView(
@@ -57,18 +60,22 @@ class HomePage extends StatelessWidget {
               listTitle: "Find Your Mood",
               featureChildren: moodWithDescription.entries.map((entry) {
                 if (kDebugMode) print("showing mood: ${entry.key}");
-                return BoxMain(
-                  cover: MoodCovers.coverArtLinks[entry.key] ?? "",
-                  title: entry.key,
-                  description: entry.value,
-                  onTap:
-                      () {}, // TO-DO: Update the on tap to a specific screen with list of tracks matching the mood selected.
+                return MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: BoxMain(
+                    cover: MoodCovers.coverArtLinks[entry.key] ?? "",
+                    title: entry.key,
+                    description: entry.value,
+                    onTap:
+                        () {}, // TO-DO: Update the on tap to a specific screen with list of tracks matching the mood selected.
+                  ),
                 );
               }).toList(),
             ),
 
             // List of Genre using builder
             ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: genreModel.uniqueSortedGenres.length,
               shrinkWrap: true,
               itemBuilder: (context, index) {
@@ -82,33 +89,20 @@ class HomePage extends StatelessWidget {
                 return FeaturedMain(
                   listTitle: genreModel.uniqueSortedGenres[index],
                   listPage: () {},
-                  featureChildren: [
-                    ListView.builder(
-                      itemCount: genreFilteredTracks.length,
-                      scrollDirection: Axis.horizontal,
-                      shrinkWrap: true,
-                      itemBuilder: (context, key) {
-                        return MouseRegion(
-                          cursor: SystemMouseCursors.click,
-                          child: BoxMain(
-                            cover: genreFilteredTracks[key].getArtwork(
-                              ArtworkSize.small,
-                            )!, // track artwork
-                            title:
-                                genreFilteredTracks[key].title, // track title
-                            description: genreFilteredTracks[key]
-                                .artist, // For track description, i display artists
-                            onTap: () {
-                              updateCurrentTrack(
-                                genreFilteredTracks[key],
-                              );
-                            }, // should build a navigation or pop-up to open the track in big mode and play
-                            isNetwork: true,
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                  featureChildren: genreFilteredTracks.map((track) {
+                    return MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: BoxMain(
+                        cover: track.getArtwork(ArtworkSize.small)!,
+                        title: track.title,
+                        description: track.artist,
+                        onTap: () {
+                          updateCurrentTrack(track);
+                        },
+                        isNetwork: true,
+                      ),
+                    );
+                  }).toList(),
                 );
               },
             ),
