@@ -26,7 +26,7 @@ class MusicPlayerMain extends StatefulWidget {
 
 class _MusicPlayerState extends State<MusicPlayerMain> {
   /// button to check if music player is full screen or not
-  bool musicPlayerFullScreen = false; // by default in mini-player mode
+  bool isMusicPlayerFullScreen = false; // by default in mini-player mode
 
   /// [ColorScheme] to hold the color scheme of the current track's artwork
   ColorScheme? imageColorScheme;
@@ -125,7 +125,7 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
   /// Function to update the music player state
   void updateMusicPlayerState() {
     setState(() {
-      musicPlayerFullScreen = !musicPlayerFullScreen;
+      isMusicPlayerFullScreen = !isMusicPlayerFullScreen;
     });
   }
 
@@ -169,8 +169,8 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(BlurRadius.radius),
       child: Container(
-        height: MediaQuery.sizeOf(context).height - 24, // Padding space 
-        width: musicPlayerFullScreen ? MediaQuery.sizeOf(context).width : 400,
+        height: MediaQuery.sizeOf(context).height - 24, // Padding space
+        width: isMusicPlayerFullScreen ? MediaQuery.sizeOf(context).width : 400,
         decoration: BoxDecoration(
           border: Border.all(
             width: 2,
@@ -182,7 +182,7 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
           alignment: Alignment.center,
           children: [
             // Background image
-            musicPlayerFullScreen
+            isMusicPlayerFullScreen
                 ? Row(
                     children: [
                       Flexible(
@@ -213,15 +213,16 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
                       ),
                     ],
                   ),
-      
+
             // the player UI (note made only for small view first)
-            musicPlayerFullScreen
-                ? PageView(
+            isMusicPlayerFullScreen
+                ? Row()
+                : PageView(
                     controller: _pageController,
                     children: [
                       // The lyrics page
                       LyricPage(),
-      
+
                       // the music control page
                       ControlPage(
                         currentPosition: 0,
@@ -234,12 +235,11 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
                         prevTrack: () {},
                         likeTrack: () {},
                       ),
-      
+
                       // the queue page
                     ],
-                  )
-                : Row(),
-      
+                  ),
+
             // Top App bar
             Positioned(
               top: 0,
@@ -254,14 +254,14 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const SizedBox(width: 5),
-              
+
                       IconButton(
                         onPressed: updateMusicPlayerState,
                         icon: const FaIcon(FontAwesomeIcons.chevronDown),
                       ),
-              
+
                       const SizedBox(width: 15),
-              
+
                       GlassAnim(
                         animationDirection: Axis.horizontal,
                         child: AppBarMain(
@@ -270,9 +270,9 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
                           requiredWidth: 50,
                         ),
                       ),
-              
+
                       const SizedBox(width: 15),
-              
+
                       const Opacity(
                         opacity: 0,
                         child: IgnorePointer(
