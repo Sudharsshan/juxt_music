@@ -52,17 +52,20 @@ class ControlPage extends StatelessWidget {
                 Theme.of(context).scaffoldBackgroundColor.withAlpha(102),
                 Colors.transparent,
               ],
-              stops: const [0.0, 0.8],
+              stops: const [0.0, 0.3],
             ),
-            child: Column(
-              children: [
-                // Featured artist SECTION COMMING SOON
-
-                // Info Row
-                infoRow(context),
-
-                // Player Row
-              ],
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  // Featured artist SECTION COMMING SOON
+              
+                  // Info Row
+                  infoRow(context),
+              
+                  // Player Row
+                ],
+              ),
             ),
           ),
         ),
