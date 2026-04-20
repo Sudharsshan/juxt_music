@@ -27,7 +27,18 @@ class _AppBarMainState extends State<AppBarMain>
   void initState() {
     super.initState();
 
+    // Initial value for the var
     activePage = widget.pageNotifier.value;
+
+    // Attach a listener to be called when manual page change occurs
+    widget.pageNotifier.addListener(updateActivePage);
+  }
+
+  /// Function to update the pageNotifier var
+  void updateActivePage() {
+    setState(() {
+      activePage = widget.pageNotifier.value;
+    });
   }
 
   void handlePageChange(int buttonID) {}

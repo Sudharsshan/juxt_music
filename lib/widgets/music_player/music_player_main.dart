@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:juxt_music/global_var/artwork_sizes/artwork_sizes.dart';
@@ -91,6 +92,16 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
+    });
+  }
+
+  /// Function to update the notifier so that the app bar can update
+  void updateNotifier(int value) {
+    if (value == pageNotifier.value) return;
+
+    if (kDebugMode) print("Page changed manually to :$value");
+    setState(() {
+      pageNotifier.value = value;
     });
   }
 
@@ -219,6 +230,7 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
                 ? Row()
                 : PageView(
                     controller: _pageController,
+                    onPageChanged: (value) => updateNotifier(value),
                     children: [
                       // The lyrics page
                       LyricPage(),
