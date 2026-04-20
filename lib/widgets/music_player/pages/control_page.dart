@@ -45,7 +45,13 @@ class ControlPage extends StatelessWidget {
             child: ClipRRect(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                child: Column(children: [infoRow(context)]),
+                child: Padding(
+                  padding: const EdgeInsets.all(18.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [infoRow(context)],
+                  ),
+                ),
               ),
             ),
           ),
@@ -55,52 +61,55 @@ class ControlPage extends StatelessWidget {
   }
 
   Widget infoRow(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Title and Artist text
-                Text(
-                  title,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge!.copyWith(fontSize: 12),
-                  overflow: TextOverflow.clip,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  artist,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleMedium!.copyWith(fontSize: 12),
-                ),
-              ],
-            ),
-          ),
-
-          // Like button
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: IconButton(
-              onPressed: () => likeTrack,
-              icon: Icon(
-                isTrackFavorite ? Icons.star : Icons.star_border,
-                color: Theme.of(context).textTheme.bodySmall!.color,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Title and Artist text
+              Text(
+                title,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyLarge!.copyWith(fontSize: 12),
+                overflow: TextOverflow.clip,
               ),
+              const SizedBox(height: 4),
+              Text(
+                artist,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium!.copyWith(fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+
+        // Like button
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: IconButton(
+            onPressed: () => likeTrack,
+            icon: Icon(
+              isTrackFavorite ? Icons.star : Icons.star_border,
+              color: Theme.of(context).textTheme.titleMedium!.color,
             ),
           ),
+        ),
 
-          // More options button
-          IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
-        ],
-      ),
+        // More options button
+        IconButton(
+          onPressed: () {},
+          icon: Icon(
+            Icons.more_vert,
+            color: Theme.of(context).textTheme.titleMedium!.color,
+          ),
+        ),
+      ],
     );
   }
 
