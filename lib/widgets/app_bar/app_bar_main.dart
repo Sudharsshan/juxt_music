@@ -21,13 +21,14 @@ class AppBarMain extends StatefulWidget {
 
 class _AppBarMainState extends State<AppBarMain>
     with SingleTickerProviderStateMixin {
+  late int activePage;
+
   @override
   void initState() {
     super.initState();
+
+    activePage = widget.pageNotifier.value;
   }
-
-  late int activePage = 0;
-
 
   void handlePageChange(int buttonID) {}
 
