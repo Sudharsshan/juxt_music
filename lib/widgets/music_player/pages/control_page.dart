@@ -1,5 +1,6 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'package:gradient_blur/gradient_blur.dart';
 
 /// This widget is the control page of the music player
 /// It is a full screen widget that is displayed when the user
@@ -39,32 +40,12 @@ class ControlPage extends StatelessWidget {
         // rest of the control UI
         Flexible(
           flex: 1,
-          child: GradientBlur(
-            maxBlur: 12,
-            minBlur: 0,
-            slices: 20,
-            edgeBlur: null,
-            curve: Curves.linear,
-            gradient: LinearGradient(
-              begin: AlignmentGeometry.topCenter,
-              end: AlignmentGeometry.bottomCenter,
-              colors: [
-                Theme.of(context).scaffoldBackgroundColor.withAlpha(102),
-                Colors.transparent,
-              ],
-              stops: const [0.0, 0.3],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  // Featured artist SECTION COMMING SOON
-              
-                  // Info Row
-                  infoRow(context),
-              
-                  // Player Row
-                ],
+          child: Container(
+            color: Colors.white.withAlpha(25),
+            child: ClipRRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: Column(children: [infoRow(context)]),
               ),
             ),
           ),
@@ -74,45 +55,51 @@ class ControlPage extends StatelessWidget {
   }
 
   Widget infoRow(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Title and Artist text
-            Text(
-              title,
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge!.copyWith(fontSize: 12),
-            ),
-            Text(
-              artist,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium!.copyWith(fontSize: 12),
-            ),
-          ],
-        ),
-
-        const Spacer(),
-
-        // Like button
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: IconButton(
-            onPressed: likeTrack(),
-            icon: Icon(
-              isTrackFavorite ? Icons.star : Icons.star_border,
-              color: Theme.of(context).textTheme.bodySmall!.color,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title and Artist text
+                Text(
+                  title,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge!.copyWith(fontSize: 12),
+                  overflow: TextOverflow.clip,
+                ),
+                Text(
+                  artist,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleMedium!.copyWith(fontSize: 12),
+                ),
+              ],
             ),
           ),
-        ),
 
-        // More options button
-        IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
-      ],
+          // Like button
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+              onPressed: likeTrack(),
+              icon: Icon(
+                isTrackFavorite ? Icons.star : Icons.star_border,
+                color: Theme.of(context).textTheme.bodySmall!.color,
+              ),
+            ),
+          ),
+
+          // More options button
+          IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
+        ],
+      ),
     );
   }
 
