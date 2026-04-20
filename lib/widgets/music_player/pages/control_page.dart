@@ -74,6 +74,7 @@ class ControlPage extends StatelessWidget {
                   ).textTheme.titleLarge!.copyWith(fontSize: 12),
                   overflow: TextOverflow.clip,
                 ),
+                const SizedBox(height: 4),
                 Text(
                   artist,
                   style: Theme.of(
@@ -88,7 +89,7 @@ class ControlPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: IconButton(
-              onPressed: likeTrack(),
+              onPressed: () => likeTrack,
               icon: Icon(
                 isTrackFavorite ? Icons.star : Icons.star_border,
                 color: Theme.of(context).textTheme.bodySmall!.color,
