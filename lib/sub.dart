@@ -11,7 +11,7 @@ import 'package:juxt_music/widgets/app_bar/app_bar_main.dart';
 import 'package:juxt_music/widgets/app_bar/front_and_back.dart';
 import 'package:juxt_music/widgets/app_bar/icons_map.dart';
 import 'package:juxt_music/widgets/glass/glass_anim.dart';
-import 'package:juxt_music/widgets/music_player/music_player_main.dart';
+import 'package:juxt_music/widgets/music_player/main/music_player_main.dart';
 
 /// The sub main class which is an extension of [main.dart] class
 /// this holds the main widget functionality of maintaining

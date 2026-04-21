@@ -8,12 +8,13 @@ import 'package:juxt_music/widgets/app_bar/app_bar_blur.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_main.dart';
 import 'package:juxt_music/widgets/cover_art/cover_box_main.dart';
 import 'package:juxt_music/widgets/glass/glass_anim.dart';
+import 'package:juxt_music/widgets/music_player/main/background_provider.dart';
 import 'package:juxt_music/widgets/music_player/pages/control_page.dart';
 import 'package:juxt_music/widgets/music_player/pages/lyric_page.dart';
 
 /// Main [MusicPlayerMain] widget that returns the widgets that fill the music player
 /// This widget utilizes a [Stack] to display it's children at multiple levels such
-/// as background with [GradientBlur] and the music player controls.
+/// as background with [BackdropFilter] and the music player controls.
 class MusicPlayerMain extends StatefulWidget {
   const MusicPlayerMain({super.key, required this.trackState});
 
@@ -145,8 +146,7 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
   }
 
   String _resolveArtworkPath(SelectedTrackState trackState) {
-    return trackState.preferredArtwork ??
-        CoverBoxMain.placeHolder;
+    return trackState.preferredArtwork ?? CoverBoxMain.placeHolder;
   }
 
   bool _isNetworkArtwork(SelectedTrackState trackState) {
@@ -171,9 +171,6 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
 
   @override
   Widget build(BuildContext context) {
-    final artworkPath = _resolveArtworkPath(widget.trackState);
-    final isNetworkArtwork = _isNetworkArtwork(widget.trackState);
-    final activeColorScheme = imageColorScheme ?? Theme.of(context).colorScheme;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(BlurRadius.radius),
@@ -191,37 +188,10 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
           alignment: Alignment.center,
           children: [
             // Background image
-            isMusicPlayerFullScreen
-                ? Row(
-                    children: [
-                      Flexible(
-                        flex: 1,
-                        child: CoverBoxMain(
-                          imagePath: artworkPath,
-                          isNetwork: isNetworkArtwork,
-                        ),
-                      ),
-                      Flexible(
-                        flex: 3,
-                        child: Container(color: activeColorScheme.primary),
-                      ),
-                    ],
-                  )
-                : Column(
-                    children: [
-                      Flexible(
-                        flex: 5,
-                        child: CoverBoxMain(
-                          imagePath: artworkPath,
-                          isNetwork: isNetworkArtwork,
-                        ),
-                      ),
-                      Flexible(
-                        flex: 4,
-                        child: Container(color: activeColorScheme.primary),
-                      ),
-                    ],
-                  ),
+            BackgroundProvider(
+              trackState: widget.trackState,
+              isFullScreen: isMusicPlayerFullScreen,
+            ),
 
             // the player UI (note made only for small view first)
             isMusicPlayerFullScreen
