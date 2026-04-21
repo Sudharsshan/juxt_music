@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:juxt_music/models/audius_model.dart';
+import 'package:juxt_music/models/track/track_preview.dart';
 import 'package:juxt_music/pages/home_page.dart';
 import 'package:juxt_music/pages/trending_page.dart';
+import 'package:juxt_music/states/selected_track_state.dart';
 
 class PageControllerCustom extends StatefulWidget {
   const PageControllerCustom({
@@ -13,12 +14,12 @@ class PageControllerCustom extends StatefulWidget {
     required this.currentTrack,
   });
 
-  final ValueNotifier pageNotifier;
-  final List<AudiusModel> trackDetails;
+  final ValueNotifier<int> pageNotifier;
+  final List<TrackPreview> trackDetails;
   final bool isDataReady;
 
   /// A notifier variable to notify the currently selected track
-  final ValueNotifier<AudiusModel?> currentTrack;
+  final ValueNotifier<SelectedTrackState?> currentTrack;
 
   @override
   State<PageControllerCustom> createState() => _PageControllerSate();
@@ -38,6 +39,7 @@ class _PageControllerSate extends State<PageControllerCustom> {
 
   @override
   void dispose() {
+    widget.pageNotifier.removeListener(changePage);
     _pageController.dispose();
     super.dispose();
   }

@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:juxt_music/models/audius_model.dart';
-import 'package:juxt_music/models/genre_model.dart';
-import 'package:juxt_music/models/mood/mood_model.dart';
+import 'package:juxt_music/models/track/track_detail.dart';
+import 'package:juxt_music/models/track/track_preview.dart';
 import 'package:juxt_music/pages/controller/page_controller_custom.dart';
-import 'package:juxt_music/service/fetch_live_nodes.dart';
+import 'package:juxt_music/service/mirror_provider.dart';
 import 'package:juxt_music/service/trending_service.dart';
+import 'package:juxt_music/states/selected_track_state.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_blur.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_main.dart';
 import 'package:juxt_music/widgets/app_bar/front_and_back.dart';
@@ -25,17 +25,19 @@ class Sub extends StatefulWidget {
 }
 
 class _SubState extends State<Sub> {
-  ValueNotifier<int> pageNotifier = ValueNotifier(0);
-  int limit = 50;
-  ValueNotifier<int> offsetNotifier = ValueNotifier(0);
-  late List<dynamic> response;
-  List<AudiusModel> trackDetails = [];
+  final ValueNotifier<int> pageNotifier = ValueNotifier(0);
+  final ValueNotifier<int> offsetNotifier = ValueNotifier(0);
+  final TrendingService _trendingService = TrendingService();
+  final MirrorProvider _mirrorProvider = MirrorProvider();
+  final Map<String, TrackDetail> _detailCache = {};
+
+  final int limit = 50;
+  List<TrackPreview> trackDetails = [];
   bool isDetailsReady = false;
-  late MoodModel moodModel;
-  late GenreModel genreModel;
 
   /// selected track to play
-  ValueNotifier<AudiusModel?> trackSelected = ValueNotifier<AudiusModel?>(
+  final ValueNotifier<SelectedTrackState?> trackSelected =
+      ValueNotifier<SelectedTrackState?>(
     null,
   ); // defaulted to a random value
 
@@ -43,6 +45,7 @@ class _SubState extends State<Sub> {
   void initState() {
     super.initState();
 
+    trackSelected.addListener(_hydrateSelectedTrack);
     updateTrends();
   }
 
@@ -52,41 +55,71 @@ class _SubState extends State<Sub> {
   /// So that all the children widgets are notified as data is ready and
   /// can utilize the available data to build their required widgets.
   Future<void> updateTrends() async {
-    // obtain the JSON data from api
-    TrendingService trendingService = TrendingService();
-    response = await trendingService.fetchTrendingTracks(
+    final fetchedTracks = await _trendingService.fetchTrendingTracks(
       limit: limit,
       offset: offsetNotifier.value,
     );
-    if (kDebugMode) print("Response Ready. \n${response.length}");
+    if (kDebugMode) print("Response Ready. \n${fetchedTracks.length}");
 
-    await parseJSON();
-
-    if(!mounted) return;
+    if (!mounted) return;
 
     setState(() {
+      trackDetails = fetchedTracks;
       isDetailsReady = true;
     });
   }
 
-  /// Function [parseJSON] parses the JSON map fetched from the service
-  /// from [Audius] server and stores it into a global variable called
-  /// [trackDetails] as [List<String> trackDetails]
-  /// This function also fetches the mirror links as a [List<String> nodes]
-  Future<void> parseJSON() async {
-    // fetch a list of active nodes which can stream data or music
-    final List<String> nodes = await FetchLiveNodes().fetchHealthyMirrors();
-    // parse the JSON data obtained from API
-    trackDetails = response
-        .map((json) => AudiusModel.fromJson(json, nodes))
-        .toList();
-    // if (kDebugMode) print("Track details:\n${trackDetails[0].mood}");
+  /// Hydrates the selected preview with richer detail only when a user opens a
+  /// track. This keeps the feed cheap while letting the player upgrade itself
+  /// after selection.
+  Future<void> _hydrateSelectedTrack() async {
+    final selected = trackSelected.value;
+    if (selected == null || !selected.isLoadingDetail || selected.detail != null) {
+      return;
+    }
+
+    final cachedDetail = _detailCache[selected.preview.id];
+    if (cachedDetail != null) {
+      trackSelected.value = selected.copyWith(
+        detail: cachedDetail,
+        isLoadingDetail: false,
+      );
+      return;
+    }
+
+    final String requestedTrackId = selected.preview.id;
+    final TrackDetail? detail = await _trendingService.fetchTrackDetail(
+      trackId: requestedTrackId,
+      mirrorProvider: _mirrorProvider,
+    );
+
+    if (!mounted) return;
+
+    final latestSelected = trackSelected.value;
+    if (latestSelected == null || latestSelected.preview.id != requestedTrackId) {
+      return;
+    }
+
+    if (detail == null) {
+      trackSelected.value = latestSelected.copyWith(isLoadingDetail: false);
+      return;
+    }
+
+    _detailCache[requestedTrackId] = detail;
+    trackSelected.value = latestSelected.copyWith(
+      detail: detail,
+      isLoadingDetail: false,
+    );
   }
 
-  // if (kDebugMode) print("Response data:\n$response");
-
-  /// Function [playThisTrack] takes the [AudiusModel] of the track the user
-  /// selects and then updates the global variable
+  @override
+  void dispose() {
+    trackSelected.removeListener(_hydrateSelectedTrack);
+    pageNotifier.dispose();
+    offsetNotifier.dispose();
+    trackSelected.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,7 +184,7 @@ class _SubState extends State<Sub> {
 
               return Padding(
                 padding: const EdgeInsets.all(12.0),
-                child: MusicPlayerMain(trackDetails: track),
+                child: MusicPlayerMain(trackState: track),
               );
             },
           ),

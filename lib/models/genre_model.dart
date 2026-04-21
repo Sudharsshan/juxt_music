@@ -1,11 +1,11 @@
-import 'package:juxt_music/models/audius_model.dart';
+import 'package:juxt_music/models/track/track_preview.dart';
 
 class GenreModel {
   final List<String> genres;
 
   GenreModel({required this.genres});
 
-  factory GenreModel.fromTrackList(List<AudiusModel> tracks) {
+  factory GenreModel.fromTrackList(List<TrackPreview> tracks) {
     final List<String> extractedGenres = tracks
         .map((track) => track.genre.trim())
         .where((genre) => genre.isNotEmpty && genre != 'Other')
@@ -21,8 +21,8 @@ class GenreModel {
     return unique;
   }
 
-  static List<AudiusModel> filterByGenre(
-    List<AudiusModel> tracks,
+  static List<TrackPreview> filterByGenre(
+    List<TrackPreview> tracks,
     String targetGenre,
   ) {
     return tracks.where((track) => track.genre == targetGenre).toList();

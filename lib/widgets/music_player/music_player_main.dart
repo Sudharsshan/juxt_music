@@ -1,10 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:juxt_music/global_var/artwork_sizes/artwork_sizes.dart';
 import 'package:juxt_music/global_var/blur_radius.dart';
 import 'package:juxt_music/global_var/music_player_appBar/music_player_icon_map.dart';
-import 'package:juxt_music/models/audius_model.dart';
+import 'package:juxt_music/states/selected_track_state.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_blur.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_main.dart';
 import 'package:juxt_music/widgets/cover_art/cover_box_main.dart';
@@ -16,10 +15,11 @@ import 'package:juxt_music/widgets/music_player/pages/lyric_page.dart';
 /// This widget utilizes a [Stack] to display it's children at multiple levels such
 /// as background with [GradientBlur] and the music player controls.
 class MusicPlayerMain extends StatefulWidget {
-  const MusicPlayerMain({super.key, required this.trackDetails});
+  const MusicPlayerMain({super.key, required this.trackState});
 
-  /// A [AudiusModel] variable to hold the track details to show
-  final AudiusModel trackDetails;
+  /// Selected track state. The preview is always available and detail enriches
+  /// the UI after the lazy fetch completes.
+  final SelectedTrackState trackState;
 
   @override
   State<MusicPlayerMain> createState() => _MusicPlayerState();
@@ -60,7 +60,7 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final paletteKey = _paletteKeyFor(widget.trackDetails);
+    final paletteKey = _paletteKeyFor(widget.trackState);
     if (_lastPaletteKey != paletteKey) {
       _lastPaletteKey = paletteKey;
       updateColorScheme();
@@ -71,8 +71,8 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
   void didUpdateWidget(covariant MusicPlayerMain oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    final oldKey = _paletteKeyFor(oldWidget.trackDetails);
-    final newKey = _paletteKeyFor(widget.trackDetails);
+    final oldKey = _paletteKeyFor(oldWidget.trackState);
+    final newKey = _paletteKeyFor(widget.trackState);
 
     if (oldKey != newKey) {
       _lastPaletteKey = newKey;
@@ -109,7 +109,7 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
   Future<void> updateColorScheme() async {
     final int requestId = ++_paletteRequestId;
     final brightness = MediaQuery.platformBrightnessOf(context);
-    final ImageProvider provider = _artworkProvider(widget.trackDetails);
+    final ImageProvider provider = _artworkProvider(widget.trackState);
 
     try {
       final ColorScheme newScheme = await ColorScheme.fromImageProvider(
@@ -140,24 +140,22 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
     });
   }
 
-  String _paletteKeyFor(AudiusModel track) {
-    return '${track.id}|${_resolveArtworkPath(track)}|${MediaQuery.platformBrightnessOf(context).name}';
+  String _paletteKeyFor(SelectedTrackState trackState) {
+    return '${trackState.preview.id}|${_resolveArtworkPath(trackState)}|${MediaQuery.platformBrightnessOf(context).name}|${trackState.detail != null}';
   }
 
-  String _resolveArtworkPath(AudiusModel track) {
-    return track.getArtwork(ArtworkSize.large) ??
-        track.getArtwork(ArtworkSize.medium) ??
-        track.getArtwork(ArtworkSize.small) ??
+  String _resolveArtworkPath(SelectedTrackState trackState) {
+    return trackState.preferredArtwork ??
         CoverBoxMain.placeHolder;
   }
 
-  bool _isNetworkArtwork(AudiusModel track) {
-    return _resolveArtworkPath(track).startsWith('http');
+  bool _isNetworkArtwork(SelectedTrackState trackState) {
+    return _resolveArtworkPath(trackState).startsWith('http');
   }
 
-  ImageProvider _artworkProvider(AudiusModel track) {
-    final path = _resolveArtworkPath(track);
-    if (_isNetworkArtwork(track)) {
+  ImageProvider _artworkProvider(SelectedTrackState trackState) {
+    final path = _resolveArtworkPath(trackState);
+    if (_isNetworkArtwork(trackState)) {
       return NetworkImage(path);
     }
     return AssetImage(path);
@@ -173,8 +171,8 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
 
   @override
   Widget build(BuildContext context) {
-    final artworkPath = _resolveArtworkPath(widget.trackDetails);
-    final isNetworkArtwork = _isNetworkArtwork(widget.trackDetails);
+    final artworkPath = _resolveArtworkPath(widget.trackState);
+    final isNetworkArtwork = _isNetworkArtwork(widget.trackState);
     final activeColorScheme = imageColorScheme ?? Theme.of(context).colorScheme;
 
     return ClipRRect(
@@ -238,10 +236,10 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
                       // the music control page
                       ControlPage(
                         currentPosition: 0,
-                        totalDuration: 0.00,
+                        totalDuration: widget.trackState.duration.toDouble(),
                         isPlaying: isPlaying,
-                        title: widget.trackDetails.title,
-                        artist: widget.trackDetails.artist,
+                        title: widget.trackState.title,
+                        artist: widget.trackState.artistName,
                         playPause: () {},
                         nextTrack: () {},
                         prevTrack: () {},

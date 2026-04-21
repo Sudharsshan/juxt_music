@@ -1,11 +1,11 @@
-import 'package:juxt_music/models/audius_model.dart';
+import 'package:juxt_music/models/track/track_preview.dart';
 
 class MoodModel {
   final List<String> moods;
 
   MoodModel({required this.moods});
 
-  factory MoodModel.fromTrackList(List<AudiusModel> tracks) {
+  factory MoodModel.fromTrackList(List<TrackPreview> tracks) {
     final List<String> extractedMoods = tracks
         .map((track) => track.mood.trim())
         .where((mood) => mood.isNotEmpty && mood != 'None')
@@ -21,8 +21,8 @@ class MoodModel {
     return unique;
   }
 
-  static List<AudiusModel> filterByMood(
-    List<AudiusModel> tracks,
+  static List<TrackPreview> filterByMood(
+    List<TrackPreview> tracks,
     String targetMood,
   ) {
     return tracks.where((track) => track.mood == targetMood).toList();

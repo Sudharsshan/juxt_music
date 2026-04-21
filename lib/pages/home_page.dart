@@ -1,12 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:juxt_music/global_var/artwork_sizes/artwork_sizes.dart';
 import 'package:juxt_music/global_var/description_chart.dart';
 import 'package:juxt_music/global_var/links/mood_covers.dart';
-import 'package:juxt_music/models/audius_model.dart';
 import 'package:juxt_music/models/genre_model.dart';
 import 'package:juxt_music/models/mood/mood_model.dart';
+import 'package:juxt_music/models/track/track_preview.dart';
 import 'package:juxt_music/service/gen_description.dart';
+import 'package:juxt_music/states/selected_track_state.dart';
+import 'package:juxt_music/widgets/cover_art/cover_box_main.dart';
 import 'package:juxt_music/widgets/featured_list/featured_main.dart';
 import 'package:juxt_music/widgets/music_box/box_main.dart';
 
@@ -21,15 +22,18 @@ class HomePage extends StatelessWidget {
     required this.selectedTrack,
   });
 
-  /// An [AudiusModel] variable to hold the track details to show
-  final List<AudiusModel> trackDetails;
+  /// A [TrackPreview] list used to render feed rows.
+  final List<TrackPreview> trackDetails;
 
-  /// A [AudiusModel] variable to hold the currently selected track to play
-  final ValueNotifier<AudiusModel?> selectedTrack;
+  /// Holds the selected preview and its optional lazy-loaded detail.
+  final ValueNotifier<SelectedTrackState?> selectedTrack;
 
   /// Function updates the [ValueNotifier] variable with the selected track ID
-  void updateCurrentTrack(AudiusModel track) {
-    selectedTrack.value = track;
+  void updateCurrentTrack(TrackPreview track) {
+    selectedTrack.value = SelectedTrackState(
+      preview: track,
+      isLoadingDetail: true,
+    );
   }
 
   @override
@@ -80,7 +84,7 @@ class HomePage extends StatelessWidget {
               itemCount: genreModel.uniqueSortedGenres.length,
               shrinkWrap: true,
               itemBuilder: (context, index) {
-                final List<AudiusModel> genreFilteredTracks =
+                final List<TrackPreview> genreFilteredTracks =
                     GenreModel.filterByGenre(
                       trackDetails,
                       genreModel.uniqueSortedGenres[index],
@@ -94,13 +98,13 @@ class HomePage extends StatelessWidget {
                     return MouseRegion(
                       cursor: SystemMouseCursors.click,
                       child: BoxMain(
-                        cover: track.getArtwork(ArtworkSize.small)!,
+                        cover: track.listArtwork ?? CoverBoxMain.placeHolder,
                         title: track.title,
-                        description: track.artist,
+                        description: track.artist.name,
                         onTap: () {
                           updateCurrentTrack(track);
                         },
-                        isNetwork: true,
+                        isNetwork: (track.listArtwork ?? '').startsWith('http'),
                       ),
                     );
                   }).toList(),
