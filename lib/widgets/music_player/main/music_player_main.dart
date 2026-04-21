@@ -6,7 +6,6 @@ import 'package:juxt_music/global_var/music_player_appBar/music_player_icon_map.
 import 'package:juxt_music/states/selected_track_state.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_blur.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_main.dart';
-import 'package:juxt_music/widgets/cover_art/cover_box_main.dart';
 import 'package:juxt_music/widgets/glass/glass_anim.dart';
 import 'package:juxt_music/widgets/music_player/main/background_provider.dart';
 import 'package:juxt_music/widgets/music_player/pages/control_page.dart';
@@ -45,9 +44,6 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
   /// [bool] to ensure color scheme is ready before widgets are drawn
   bool isColorSchemeReady = false;
 
-  String? _lastPaletteKey;
-  int _paletteRequestId = 0;
-
   @override
   void initState() {
     super.initState();
@@ -57,33 +53,6 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
     pageNotifier.addListener(changePage);
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    final paletteKey = _paletteKeyFor(widget.trackState);
-    if (_lastPaletteKey != paletteKey) {
-      _lastPaletteKey = paletteKey;
-      updateColorScheme();
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant MusicPlayerMain oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    final oldKey = _paletteKeyFor(oldWidget.trackState);
-    final newKey = _paletteKeyFor(widget.trackState);
-
-    if (oldKey != newKey) {
-      _lastPaletteKey = newKey;
-      setState(() {
-        imageColorScheme = null;
-        isColorSchemeReady = false;
-      });
-      updateColorScheme();
-    }
-  }
 
   /// Function to change the page
   void changePage() {
@@ -106,59 +75,12 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
     });
   }
 
-  /// Function to update the color scheme of the current track's artwork
-  Future<void> updateColorScheme() async {
-    final int requestId = ++_paletteRequestId;
-    final brightness = MediaQuery.platformBrightnessOf(context);
-    final ImageProvider provider = _artworkProvider(widget.trackState);
-
-    try {
-      final ColorScheme newScheme = await ColorScheme.fromImageProvider(
-        provider: provider,
-        brightness: brightness,
-      );
-
-      if (!mounted || requestId != _paletteRequestId) return;
-
-      setState(() {
-        imageColorScheme = newScheme;
-        isColorSchemeReady = true;
-      });
-    } catch (_) {
-      if (!mounted || requestId != _paletteRequestId) return;
-
-      setState(() {
-        imageColorScheme = Theme.of(context).colorScheme;
-        isColorSchemeReady = true;
-      });
-    }
-  }
 
   /// Function to update the music player state
   void updateMusicPlayerState() {
     setState(() {
       isMusicPlayerFullScreen = !isMusicPlayerFullScreen;
     });
-  }
-
-  String _paletteKeyFor(SelectedTrackState trackState) {
-    return '${trackState.preview.id}|${_resolveArtworkPath(trackState)}|${MediaQuery.platformBrightnessOf(context).name}|${trackState.detail != null}';
-  }
-
-  String _resolveArtworkPath(SelectedTrackState trackState) {
-    return trackState.preferredArtwork ?? CoverBoxMain.placeHolder;
-  }
-
-  bool _isNetworkArtwork(SelectedTrackState trackState) {
-    return _resolveArtworkPath(trackState).startsWith('http');
-  }
-
-  ImageProvider _artworkProvider(SelectedTrackState trackState) {
-    final path = _resolveArtworkPath(trackState);
-    if (_isNetworkArtwork(trackState)) {
-      return NetworkImage(path);
-    }
-    return AssetImage(path);
   }
 
   @override
@@ -268,9 +190,5 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
         ),
       ),
     );
-  }
-
-  Widget backgroundBuilder(bool isFullScreen, Widget backgroundImage) {
-    return Positioned(child: backgroundImage);
   }
 }
