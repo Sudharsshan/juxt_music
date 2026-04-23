@@ -128,33 +128,37 @@ class _BackgroundProviderState extends State<BackgroundProvider> {
     final isNetworkArtwork = _isNetworkArtwork(widget.trackState);
     final activeColorScheme = imageColorScheme ?? Theme.of(context).colorScheme;
 
-    return widget.isFullScreen
-        ? Row(
-            children: [
-              Flexible(
-                flex: 1,
-                child: CoverBoxMain(
-                  imagePath: artworkPath,
-                  isNetwork: isNetworkArtwork,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 420),
+      curve: Curves.easeInOut,
+      child: widget.isFullScreen
+          ? Row(
+              children: [
+                Flexible(
+                  flex: 1,
+                  child: CoverBoxMain(
+                    imagePath: artworkPath,
+                    isNetwork: isNetworkArtwork,
+                  ),
                 ),
-              ),
-              Flexible(
-                flex: 3,
-                child: Container(color: activeColorScheme.primary),
-              ),
-            ],
-          )
-        : Column(
-            children: [
-              Flexible(
-                flex: 5,
-                child: CoverBoxMain(
-                  imagePath: artworkPath,
-                  isNetwork: isNetworkArtwork,
+                Flexible(
+                  flex: 3,
+                  child: Container(color: activeColorScheme.primary),
                 ),
-              ),
-              Flexible(flex: 4, child: Container(color: background)),
-            ],
-          );
+              ],
+            )
+          : Column(
+              children: [
+                Flexible(
+                  flex: 5,
+                  child: CoverBoxMain(
+                    imagePath: artworkPath,
+                    isNetwork: isNetworkArtwork,
+                  ),
+                ),
+                Flexible(flex: 4, child: Container(color: background)),
+              ],
+            ),
+    );
   }
 }
