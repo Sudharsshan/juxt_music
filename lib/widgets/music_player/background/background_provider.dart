@@ -1,6 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:juxt_music/states/selected_track_state.dart';
 import 'package:juxt_music/widgets/cover_art/cover_box_main.dart';
+import 'package:juxt_music/widgets/music_player/background/color_picker_service.dart';
 
 /// Provides the background shown on the music player widget.
 class BackgroundProvider extends StatefulWidget {
@@ -25,9 +29,13 @@ class _BackgroundProviderState extends State<BackgroundProvider> {
   String? _lastPaletteKey;
   int _paletteRequestId = 0;
 
+  late Color background;
+
   @override
   void initState() {
     super.initState();
+
+    background = Colors.black.withAlpha(102);
   }
 
   @override
@@ -59,24 +67,30 @@ class _BackgroundProviderState extends State<BackgroundProvider> {
   }
 
   Future<void> updateColorScheme() async {
+    if (kDebugMode) print("Color picking started..");
     final int requestId = ++_paletteRequestId;
-    final brightness = MediaQuery.platformBrightnessOf(context);
-    final ImageProvider provider = _artworkProvider(widget.trackState);
 
     try {
-      final ColorScheme newScheme = await ColorScheme.fromImageProvider(
-        provider: provider,
-        brightness: brightness,
+      if (kDebugMode) print("Custom picker started");
+
+      final bytes = await _artworkProvider(widget.trackState);
+
+      if (kDebugMode) print("Img bypes: ${bytes.buffer.lengthInBytes}");
+      background = ColorPickerService.getDominantColor(
+        bytes.buffer.asUint8List(),
       );
+
+      if (kDebugMode) print("Chosen color: $background");
 
       if (!mounted || requestId != _paletteRequestId) return;
 
       setState(() {
-        imageColorScheme = newScheme;
         isColorSchemeReady = true;
       });
     } catch (_) {
       if (!mounted || requestId != _paletteRequestId) return;
+
+      if (kDebugMode) print("No color found.");
 
       setState(() {
         imageColorScheme = Theme.of(context).colorScheme;
@@ -97,12 +111,15 @@ class _BackgroundProviderState extends State<BackgroundProvider> {
     return _resolveArtworkPath(trackState).startsWith('http');
   }
 
-  ImageProvider _artworkProvider(SelectedTrackState trackState) {
+  Future<ByteData> _artworkProvider(SelectedTrackState trackState) async {
     final path = _resolveArtworkPath(trackState);
+
     if (_isNetworkArtwork(trackState)) {
-      return NetworkImage(path);
+      final response = await http.get(Uri.parse(path));
+      final bytes = response.bodyBytes.buffer.asByteData();
+      return bytes;
     }
-    return AssetImage(path);
+    return rootBundle.load(path);
   }
 
   @override
@@ -136,10 +153,7 @@ class _BackgroundProviderState extends State<BackgroundProvider> {
                   isNetwork: isNetworkArtwork,
                 ),
               ),
-              Flexible(
-                flex: 4,
-                child: Container(color: activeColorScheme.primary),
-              ),
+              Flexible(flex: 4, child: Container(color: background)),
             ],
           );
   }
