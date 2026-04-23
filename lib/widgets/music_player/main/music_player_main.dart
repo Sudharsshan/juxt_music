@@ -7,7 +7,7 @@ import 'package:juxt_music/states/selected_track_state.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_blur.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_main.dart';
 import 'package:juxt_music/widgets/glass/glass_anim.dart';
-import 'package:juxt_music/widgets/music_player/main/background_provider.dart';
+import 'package:juxt_music/widgets/music_player/background/background_provider.dart';
 import 'package:juxt_music/widgets/music_player/pages/control_page.dart';
 import 'package:juxt_music/widgets/music_player/pages/lyric_page.dart';
 
