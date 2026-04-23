@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:juxt_music/widgets/music_player/controller/player_controller.dart';
 
 /// This widget is the control page of the music player
 /// It is a full screen widget that is displayed when the user
@@ -24,11 +26,24 @@ class ControlPage extends StatelessWidget {
   final double totalDuration;
   final bool isPlaying;
   final String title, artist;
-  final Function playPause;
-  final Function nextTrack;
-  final Function prevTrack;
+  final VoidCallback playPause;
+  final VoidCallback nextTrack;
+  final VoidCallback prevTrack;
   final bool isTrackFavorite;
-  final Function likeTrack;
+  final VoidCallback likeTrack;
+
+  Map<FaIconData, VoidCallback> get controlButton => {
+    // Shuffle
+    FontAwesomeIcons.shuffle: () {},
+    // previous
+    FontAwesomeIcons.backward: prevTrack,
+    // play pause
+    (isPlaying ? FontAwesomeIcons.pause : FontAwesomeIcons.play): playPause,
+    // next track
+    FontAwesomeIcons.forward: nextTrack,
+    // repeat
+    FontAwesomeIcons.repeat: () {},
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +64,13 @@ class ControlPage extends StatelessWidget {
                   padding: const EdgeInsets.all(18.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
-                    children: [infoRow(context)],
+                    children: [
+                      // Track information
+                      infoRow(context),
+
+                      // Track control widgets
+                      PlayerController(buttons: controlButton),
+                    ],
                   ),
                 ),
               ),

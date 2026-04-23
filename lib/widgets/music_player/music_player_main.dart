@@ -53,7 +53,6 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
     pageNotifier.addListener(changePage);
   }
 
-
   /// Function to change the page
   void changePage() {
     setState(() {
@@ -75,7 +74,6 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
     });
   }
 
-
   /// Function to update the music player state
   void updateMusicPlayerState() {
     setState(() {
@@ -93,7 +91,6 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
 
   @override
   Widget build(BuildContext context) {
-
     return ClipRRect(
       borderRadius: BorderRadius.circular(BlurRadius.radius),
       child: Container(
@@ -132,7 +129,12 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
                         isPlaying: isPlaying,
                         title: widget.trackState.title,
                         artist: widget.trackState.artistName,
-                        playPause: () {},
+                        playPause: () {
+                          setState(() {
+                            if (kDebugMode) print('Track is being: $isPlaying');
+                            isPlaying = !isPlaying;
+                          });
+                        },
                         nextTrack: () {},
                         prevTrack: () {},
                         likeTrack: () {},
