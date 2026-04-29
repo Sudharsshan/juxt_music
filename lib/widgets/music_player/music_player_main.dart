@@ -131,7 +131,8 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
                         artist: widget.trackState.artistName,
                         playPause: () {
                           setState(() {
-                            if (kDebugMode) print('Track is being: $isPlaying');
+                            if (kDebugMode)
+                              print('Track is playing: $isPlaying');
                             isPlaying = !isPlaying;
                           });
                         },
