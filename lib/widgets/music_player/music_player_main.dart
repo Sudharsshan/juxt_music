@@ -8,6 +8,7 @@ import 'package:juxt_music/widgets/app_bar/app_bar_blur.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_main.dart';
 import 'package:juxt_music/widgets/glass/glass_anim.dart';
 import 'package:juxt_music/widgets/music_player/background/background_provider.dart';
+import 'package:juxt_music/states/player_playback_state.dart';
 import 'package:juxt_music/widgets/music_player/pages/control_page.dart';
 import 'package:juxt_music/widgets/music_player/pages/lyric_page.dart';
 import 'package:juxt_music/widgets/music_player/pages/queue_page.dart';
@@ -38,8 +39,8 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
   /// [PageController] to handle change of pages
   late PageController _pageController;
 
-  /// [bool] to hold value of track is playing or not.
-  bool isPlaying = false;
+  /// Dedicated state for playback logic
+  final PlayerPlaybackState playbackState = PlayerPlaybackState();
 
   /// [bool] to ensure color scheme is ready before widgets are drawn
   bool isColorSchemeReady = false;
@@ -51,6 +52,17 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
     _pageController = PageController(initialPage: pageNotifier.value);
 
     pageNotifier.addListener(changePage);
+    
+    if (widget.musicQueState.currentTrack != null) {
+      playbackState.setTrack(widget.musicQueState.currentTrack!);
+    }
+    widget.musicQueState.addListener(_onQueueChanged);
+  }
+
+  void _onQueueChanged() {
+    if (widget.musicQueState.currentTrack != null) {
+      playbackState.setTrack(widget.musicQueState.currentTrack!);
+    }
   }
 
   /// Function to change the page
@@ -83,6 +95,8 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
 
   @override
   void dispose() {
+    widget.musicQueState.removeListener(_onQueueChanged);
+    playbackState.dispose();
     pageNotifier.removeListener(changePage);
     _pageController.dispose();
     pageNotifier.dispose();
@@ -126,19 +140,7 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
 
                       // the music control page
                       ControlPage(
-                        currentPosition: 0,
-                        totalDuration: trackState.duration.toDouble(),
-                        isPlaying: isPlaying,
-                        title: trackState.title,
-                        artist: trackState.artistName,
-                        playPause: () {
-                          setState(() {
-                            if (kDebugMode) {
-                              print('Track is playing: $isPlaying');
-                            }
-                            isPlaying = !isPlaying;
-                          });
-                        },
+                        playbackState: playbackState,
                         nextTrack: () {
                           final success = widget.musicQueState.nextTrack();
                           if (!success) {

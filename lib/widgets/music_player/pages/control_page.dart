@@ -2,7 +2,9 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:juxt_music/states/player_playback_state.dart';
 import 'package:juxt_music/widgets/music_player/controller/player_controller.dart';
+import 'package:juxt_music/widgets/music_track_bar/music_track_bar.dart';
 
 /// This widget is the control page of the music player
 /// It is a full screen widget that is displayed when the user
@@ -10,78 +12,79 @@ import 'package:juxt_music/widgets/music_player/controller/player_controller.dar
 class ControlPage extends StatelessWidget {
   const ControlPage({
     super.key,
-    required this.currentPosition,
-    required this.totalDuration,
-    required this.isPlaying,
-    required this.title,
-    required this.artist,
-    required this.playPause,
+    required this.playbackState,
     required this.nextTrack,
     required this.prevTrack,
     this.isTrackFavorite = false,
     required this.likeTrack,
   });
 
-  final double currentPosition;
-  final double totalDuration;
-  final bool isPlaying;
-  final String title, artist;
-  final VoidCallback playPause;
+  final PlayerPlaybackState playbackState;
   final VoidCallback nextTrack;
   final VoidCallback prevTrack;
   final bool isTrackFavorite;
   final VoidCallback likeTrack;
 
-  Map<FaIconData, VoidCallback> get controlButton => {
-    // Shuffle
-    FontAwesomeIcons.shuffle: () {},
-    // previous
-    FontAwesomeIcons.backward: prevTrack,
-    // play pause
-    (isPlaying ? FontAwesomeIcons.pause : FontAwesomeIcons.play): playPause,
-    // next track
-    FontAwesomeIcons.forward: nextTrack,
-    // repeat
-    FontAwesomeIcons.repeat: () {},
-  };
-
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // The empty spacing to view the track cover
-        Flexible(flex: 1, child: Container()),
+    return ListenableBuilder(
+      listenable: playbackState,
+      builder: (context, child) {
+        final track = playbackState.currentTrack;
+        final title = track?.title ?? '';
+        final artist = track?.artistName ?? '';
+        final isPlaying = playbackState.isPlaying;
 
-        // rest of the control UI
-        Flexible(
-          flex: 1,
-          child: Container(
-            color: Colors.white.withAlpha(25),
-            child: ClipRRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                child: Padding(
-                  padding: const EdgeInsets.all(18.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      // Track information
-                      infoRow(context),
+        return Column(
+          children: [
+            // The empty spacing to view the track cover
+            Flexible(flex: 1, child: Container()),
 
-                      // Track control widgets
-                      PlayerController(buttons: controlButton),
-                    ],
+            // rest of the control UI
+            Flexible(
+              flex: 1,
+              child: Container(
+                color: Colors.white.withAlpha(25),
+                child: ClipRRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    child: Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          // Track information
+                          infoRow(context, title, artist),
+
+                          const SizedBox(height: 12),
+
+                          // Music Track Bar
+                          MusicTrackBar(playbackState: playbackState),
+
+                          const SizedBox(height: 12),
+
+                          // Track control widgets
+                          PlayerController(buttons: {
+                            FontAwesomeIcons.shuffle: () {},
+                            FontAwesomeIcons.backward: prevTrack,
+                            (isPlaying ? FontAwesomeIcons.pause : FontAwesomeIcons.play): playbackState.playPause,
+                            FontAwesomeIcons.forward: nextTrack,
+                            FontAwesomeIcons.repeat: () {},
+                          }),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 
-  Widget infoRow(BuildContext context) {
+  Widget infoRow(BuildContext context, String title, String artist) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
