@@ -38,20 +38,24 @@ class MusicQueState extends ChangeNotifier {
     }
   }
 
-  void nextTrack() {
-    if (currentList.isEmpty) return;
+  bool nextTrack() {
+    if (currentList.isEmpty) return false;
     if (currentIndex < currentList.length - 1) {
       currentIndex++;
       notifyListeners();
+      return true;
     }
+    return false;
   }
 
-  void prevTrack() {
-    if (currentList.isEmpty) return;
+  bool prevTrack() {
+    if (currentList.isEmpty) return false;
     if (currentIndex > 0) {
       currentIndex--;
       notifyListeners();
+      return true;
     }
+    return false;
   }
 
   void playTrackById(String id) {

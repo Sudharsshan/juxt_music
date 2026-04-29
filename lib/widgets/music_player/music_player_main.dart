@@ -138,8 +138,28 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
                             isPlaying = !isPlaying;
                           });
                         },
-                        nextTrack: widget.musicQueState.nextTrack,
-                        prevTrack: widget.musicQueState.prevTrack,
+                        nextTrack: () {
+                          final success = widget.musicQueState.nextTrack();
+                          if (!success) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('No next track in queue'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          }
+                        },
+                        prevTrack: () {
+                          final success = widget.musicQueState.prevTrack();
+                          if (!success) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('No previous track in queue'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          }
+                        },
                         likeTrack: () {},
                       ),
 
