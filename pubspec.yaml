@@ -15,6 +15,10 @@ dependencies:
   http: ^1.6.0
   image: ^4.8.0
   just_audio: ^0.10.5
+  # ── Linux & Android audio backend (media_kit / libmpv) ─────────────────
+  just_audio_media_kit: ^2.1.0        # media_kit bindings for just_audio
+  media_kit_libs_linux: any            # bundled libmpv for Linux
+  media_kit_libs_android_audio: any   # bundled audio libs for Android (future)
 
 dev_dependencies:
   flutter_test:

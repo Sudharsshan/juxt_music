@@ -131,7 +131,64 @@ This project already has its own vocabulary in comments, naming, and widget stru
 - `font_awesome_flutter`
 - `gradient_blur`
 
-## Running The Project
+## Installation (compiling)
+
+### Linux (Ubuntu 20.04 LTS or later)
+
+Install the C++ build toolchain and GTK3 development headers required by Flutter's Linux embedding:
+
+```bash
+# 1. Refresh package lists
+sudo apt-get update -y
+
+# 2. Install required build tools and GTK headers
+sudo apt-get install -y \
+    clang \
+    cmake \
+    ninja-build \
+    lld \
+    pkg-config \
+    libgtk-3-dev \
+    libstdc++-12-dev
+
+# 3. Confirm Flutter's Linux toolchain is satisfied
+flutter doctor -v
+```
+
+> **Note:** No system-level `libmpv` install is needed. The `media_kit_libs_linux` dependency bundles its own pre-built libmpv inside the app bundle at compile time.
+
+Then fetch dependencies and build:
+
+```bash
+flutter pub get
+flutter build linux --release
+# Run the output binary:
+./build/linux/*/release/bundle/juxt_music
+```
+
+### Android
+
+No extra host tools beyond the Android SDK are needed (already handled by `flutter doctor`). The `media_kit_libs_android_audio` dependency is included for future full-media-kit support, but `just_audio`'s native Android engine remains active.
+
+```bash
+flutter pub get
+flutter build apk --release   # or: flutter build appbundle --release
+```
+
+### Web / macOS / Windows / iOS
+
+No changes were made to these targets — they build exactly as before:
+
+```bash
+flutter build web            # Web
+flutter build macos          # macOS (requires Xcode on macOS host)
+flutter build windows        # Windows (requires Visual Studio Build Tools)
+flutter build ios            # iOS (requires Xcode on macOS host)
+```
+
+---
+
+## Running The Project (development)
 
 ```bash
 flutter pub get

@@ -74,6 +74,10 @@ set_target_properties(${BINARY_NAME}
 # them to the application.
 include(flutter/generated_plugins.cmake)
 
+# Link mimalloc to avoid memory leaks from the media_kit / libmpv backend.
+# MIMALLOC_LIB is provided by media_kit_libs_linux's CMake fragment above.
+target_link_libraries(${BINARY_NAME} PRIVATE ${MIMALLOC_LIB})
+
 
 # === Installation ===
 # By default, "installing" just makes a relocatable bundle in the build
