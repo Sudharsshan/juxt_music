@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:juxt_music/models/track/track_preview.dart';
 import 'package:juxt_music/pages/home_page.dart';
 import 'package:juxt_music/pages/trending_page.dart';
-import 'package:juxt_music/states/selected_track_state.dart';
+import 'package:juxt_music/states/music_que_state.dart';
 
 class PageControllerCustom extends StatefulWidget {
   const PageControllerCustom({
@@ -11,15 +11,15 @@ class PageControllerCustom extends StatefulWidget {
     required this.pageNotifier,
     required this.trackDetails,
     required this.isDataReady,
-    required this.currentTrack,
+    required this.musicQueState,
   });
 
   final ValueNotifier<int> pageNotifier;
   final List<TrackPreview> trackDetails;
   final bool isDataReady;
 
-  /// A notifier variable to notify the currently selected track
-  final ValueNotifier<SelectedTrackState?> currentTrack;
+  /// A notifier variable to notify the currently selected track queue
+  final MusicQueState musicQueState;
 
   @override
   State<PageControllerCustom> createState() => _PageControllerSate();
@@ -67,7 +67,7 @@ class _PageControllerSate extends State<PageControllerCustom> {
         widget.isDataReady
             ? HomePage(
                 trackDetails: widget.trackDetails,
-                selectedTrack: widget.currentTrack,
+                musicQueState: widget.musicQueState,
               )
             : placeHolderForNoData(),
 

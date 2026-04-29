@@ -6,6 +6,7 @@ import 'package:juxt_music/models/genre_model.dart';
 import 'package:juxt_music/models/mood/mood_model.dart';
 import 'package:juxt_music/models/track/track_preview.dart';
 import 'package:juxt_music/service/gen_description.dart';
+import 'package:juxt_music/states/music_que_state.dart';
 import 'package:juxt_music/states/selected_track_state.dart';
 import 'package:juxt_music/widgets/cover_art/cover_box_main.dart';
 import 'package:juxt_music/widgets/featured_list/featured_main.dart';
@@ -19,21 +20,23 @@ class HomePage extends StatelessWidget {
   const HomePage({
     super.key,
     required this.trackDetails,
-    required this.selectedTrack,
+    required this.musicQueState,
   });
 
   /// A [TrackPreview] list used to render feed rows.
   final List<TrackPreview> trackDetails;
 
-  /// Holds the selected preview and its optional lazy-loaded detail.
-  final ValueNotifier<SelectedTrackState?> selectedTrack;
+  /// Holds the state of the music queue
+  final MusicQueState musicQueState;
 
-  /// Function updates the [ValueNotifier] variable with the selected track ID
-  void updateCurrentTrack(TrackPreview track) {
-    selectedTrack.value = SelectedTrackState(
-      preview: track,
+  /// Function updates the queue with the selected list of tracks
+  void updateCurrentTrackQueue(List<TrackPreview> tracks, TrackPreview selectedTrack) {
+    final trackStates = tracks.map((t) => SelectedTrackState(
+      preview: t,
       isLoadingDetail: true,
-    );
+    )).toList();
+    final startIndex = tracks.indexWhere((t) => t.id == selectedTrack.id);
+    musicQueState.setQueue(trackStates, startIndex: startIndex != -1 ? startIndex : 0);
   }
 
   @override
@@ -102,7 +105,7 @@ class HomePage extends StatelessWidget {
                         title: track.title,
                         description: track.artist.name,
                         onTap: () {
-                          updateCurrentTrack(track);
+                          updateCurrentTrackQueue(genreFilteredTracks, track);
                         },
                         isNetwork: (track.listArtwork ?? '').startsWith('http'),
                       ),

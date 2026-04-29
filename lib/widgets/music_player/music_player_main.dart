@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:juxt_music/global_var/blur_radius.dart';
 import 'package:juxt_music/global_var/music_player_appBar/music_player_icon_map.dart';
-import 'package:juxt_music/states/selected_track_state.dart';
+import 'package:juxt_music/states/music_que_state.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_blur.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_main.dart';
 import 'package:juxt_music/widgets/glass/glass_anim.dart';
@@ -15,11 +15,10 @@ import 'package:juxt_music/widgets/music_player/pages/lyric_page.dart';
 /// This widget utilizes a [Stack] to display it's children at multiple levels such
 /// as background with [BackdropFilter] and the music player controls.
 class MusicPlayerMain extends StatefulWidget {
-  const MusicPlayerMain({super.key, required this.trackState});
+  const MusicPlayerMain({super.key, required this.musicQueState});
 
-  /// Selected track state. The preview is always available and detail enriches
-  /// the UI after the lazy fetch completes.
-  final SelectedTrackState trackState;
+  /// Selected track state queue. 
+  final MusicQueState musicQueState;
 
   @override
   State<MusicPlayerMain> createState() => _MusicPlayerState();
@@ -91,6 +90,8 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
 
   @override
   Widget build(BuildContext context) {
+    final trackState = widget.musicQueState.currentTrack!;
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(BlurRadius.radius),
       child: Container(
@@ -108,7 +109,7 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
           children: [
             // Background image
             BackgroundProvider(
-              trackState: widget.trackState,
+              trackState: trackState,
               isFullScreen: isMusicPlayerFullScreen,
             ),
 
@@ -125,19 +126,20 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
                       // the music control page
                       ControlPage(
                         currentPosition: 0,
-                        totalDuration: widget.trackState.duration.toDouble(),
+                        totalDuration: trackState.duration.toDouble(),
                         isPlaying: isPlaying,
-                        title: widget.trackState.title,
-                        artist: widget.trackState.artistName,
+                        title: trackState.title,
+                        artist: trackState.artistName,
                         playPause: () {
                           setState(() {
-                            if (kDebugMode)
+                            if (kDebugMode) {
                               print('Track is playing: $isPlaying');
+                            }
                             isPlaying = !isPlaying;
                           });
                         },
-                        nextTrack: () {},
-                        prevTrack: () {},
+                        nextTrack: widget.musicQueState.nextTrack,
+                        prevTrack: widget.musicQueState.prevTrack,
                         likeTrack: () {},
                       ),
 

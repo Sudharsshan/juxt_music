@@ -5,7 +5,7 @@ import 'package:juxt_music/models/track/track_preview.dart';
 import 'package:juxt_music/pages/controller/page_controller_custom.dart';
 import 'package:juxt_music/service/mirror_provider.dart';
 import 'package:juxt_music/service/trending_service.dart';
-import 'package:juxt_music/states/selected_track_state.dart';
+import 'package:juxt_music/states/music_que_state.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_blur.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_main.dart';
 import 'package:juxt_music/widgets/app_bar/front_and_back.dart';
@@ -36,16 +36,13 @@ class _SubState extends State<Sub> {
   bool isDetailsReady = false;
 
   /// selected track to play
-  final ValueNotifier<SelectedTrackState?> trackSelected =
-      ValueNotifier<SelectedTrackState?>(
-    null,
-  ); // defaulted to a random value
+  final MusicQueState musicQueState = MusicQueState();
 
   @override
   void initState() {
     super.initState();
 
-    trackSelected.addListener(_hydrateSelectedTrack);
+    musicQueState.addListener(_hydrateSelectedTrack);
     updateTrends();
   }
 
@@ -73,17 +70,17 @@ class _SubState extends State<Sub> {
   /// track. This keeps the feed cheap while letting the player upgrade itself
   /// after selection.
   Future<void> _hydrateSelectedTrack() async {
-    final selected = trackSelected.value;
+    final selected = musicQueState.currentTrack;
     if (selected == null || !selected.isLoadingDetail || selected.detail != null) {
       return;
     }
 
     final cachedDetail = _detailCache[selected.preview.id];
     if (cachedDetail != null) {
-      trackSelected.value = selected.copyWith(
+      musicQueState.updateTrack(selected.copyWith(
         detail: cachedDetail,
         isLoadingDetail: false,
-      );
+      ));
       return;
     }
 
@@ -95,29 +92,29 @@ class _SubState extends State<Sub> {
 
     if (!mounted) return;
 
-    final latestSelected = trackSelected.value;
+    final latestSelected = musicQueState.currentTrack;
     if (latestSelected == null || latestSelected.preview.id != requestedTrackId) {
       return;
     }
 
     if (detail == null) {
-      trackSelected.value = latestSelected.copyWith(isLoadingDetail: false);
+      musicQueState.updateTrack(latestSelected.copyWith(isLoadingDetail: false));
       return;
     }
 
     _detailCache[requestedTrackId] = detail;
-    trackSelected.value = latestSelected.copyWith(
+    musicQueState.updateTrack(latestSelected.copyWith(
       detail: detail,
       isLoadingDetail: false,
-    );
+    ));
   }
 
   @override
   void dispose() {
-    trackSelected.removeListener(_hydrateSelectedTrack);
+    musicQueState.removeListener(_hydrateSelectedTrack);
     pageNotifier.dispose();
     offsetNotifier.dispose();
-    trackSelected.dispose();
+    musicQueState.dispose();
     super.dispose();
   }
 
@@ -131,7 +128,7 @@ class _SubState extends State<Sub> {
           pageNotifier: pageNotifier,
           trackDetails: trackDetails,
           isDataReady: isDetailsReady,
-          currentTrack: trackSelected,
+          musicQueState: musicQueState,
         ),
         // App Bar
         Positioned(
@@ -177,14 +174,15 @@ class _SubState extends State<Sub> {
         Positioned(
           top: 0,
           right: 0,
-          child: ValueListenableBuilder(
-            valueListenable: trackSelected,
-            builder: (context, track, child) {
+          child: ListenableBuilder(
+            listenable: musicQueState,
+            builder: (context, child) {
+              final track = musicQueState.currentTrack;
               if (track == null) return SizedBox.shrink();
 
               return Padding(
                 padding: const EdgeInsets.all(12.0),
-                child: MusicPlayerMain(trackState: track),
+                child: MusicPlayerMain(musicQueState: musicQueState),
               );
             },
           ),
