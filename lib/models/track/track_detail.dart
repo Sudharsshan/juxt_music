@@ -7,7 +7,7 @@ class TrackDetail {
   final String description;
   final DateTime? releaseDate;
   final String? artwork1000;
-  final String? streamUrl;
+  final List<String> streamUrls;
   final bool isStreamable;
 
   const TrackDetail({
@@ -15,7 +15,7 @@ class TrackDetail {
     required this.description,
     required this.releaseDate,
     required this.artwork1000,
-    required this.streamUrl,
+    required this.streamUrls,
     required this.isStreamable,
   });
 
@@ -23,7 +23,7 @@ class TrackDetail {
 
   factory TrackDetail.fromJson(
     Map<String, dynamic> json, {
-    required String? streamUrl,
+    required List<String> streamUrls,
   }) {
     final artwork = json['artwork'] as Map<String, dynamic>?;
 
@@ -34,7 +34,7 @@ class TrackDetail {
           ? DateTime.tryParse(json['release_date'])
           : null,
       artwork1000: artwork?['1000x1000'],
-      streamUrl: streamUrl,
+      streamUrls: streamUrls,
       isStreamable: json['is_streamable'] ?? true,
     );
   }

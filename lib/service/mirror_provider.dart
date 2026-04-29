@@ -16,8 +16,8 @@ class MirrorProvider {
     return cached!;
   }
 
-  Future<String> buildStreamUrl(String trackId) async{
+  Future<List<String>> buildStreamUrls(String trackId) async {
     final mirrors = await getMirrors();
-    return mirrors.isEmpty ? '' : '${mirrors.first}/v1/tracks/$trackId/stream';
+    return mirrors.map((mirror) => '$mirror/v1/tracks/$trackId/stream?app_name=juxt_music').toList();
   }
 }

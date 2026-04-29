@@ -36,7 +36,7 @@ class TrackPreview {
     final artwork = json['artwork'] as Map<String, dynamic>?;
 
     return TrackPreview(
-      id: json['id'] ?? '',
+      id: json['id']?.toString() ?? json['track_id']?.toString() ?? '',
       title: json['title'] ?? 'Unknown',
       artist: ArtistPreview.fromJson(json['user']),
       genre: json['genre'] ?? 'Other',

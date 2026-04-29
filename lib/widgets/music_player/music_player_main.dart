@@ -12,6 +12,7 @@ import 'package:juxt_music/states/player_playback_state.dart';
 import 'package:juxt_music/widgets/music_player/pages/control_page.dart';
 import 'package:juxt_music/widgets/music_player/pages/lyric_page.dart';
 import 'package:juxt_music/widgets/music_player/pages/queue_page.dart';
+import 'package:juxt_music/widgets/custom_snackbar/custom_snackbar.dart';
 
 /// Main [MusicPlayerMain] widget that returns the widgets that fill the music player
 /// This widget utilizes a [Stack] to display it's children at multiple levels such
@@ -54,14 +55,28 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
     pageNotifier.addListener(changePage);
     
     if (widget.musicQueState.currentTrack != null) {
-      playbackState.setTrack(widget.musicQueState.currentTrack!);
+      playbackState.setTrack(
+        widget.musicQueState.currentTrack!,
+        onError: (msg) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(CustomSnackBar(message: msg));
+          }
+        },
+      );
     }
     widget.musicQueState.addListener(_onQueueChanged);
   }
 
   void _onQueueChanged() {
     if (widget.musicQueState.currentTrack != null) {
-      playbackState.setTrack(widget.musicQueState.currentTrack!);
+      playbackState.setTrack(
+        widget.musicQueState.currentTrack!,
+        onError: (msg) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(CustomSnackBar(message: msg));
+          }
+        },
+      );
     }
   }
 
@@ -145,10 +160,7 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
                           final success = widget.musicQueState.nextTrack();
                           if (!success) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('No next track in queue'),
-                                duration: Duration(seconds: 2),
-                              ),
+                              CustomSnackBar(message: 'No next track in queue'),
                             );
                           }
                         },
@@ -156,10 +168,7 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
                           final success = widget.musicQueState.prevTrack();
                           if (!success) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('No previous track in queue'),
-                                duration: Duration(seconds: 2),
-                              ),
+                              CustomSnackBar(message: 'No previous track in queue'),
                             );
                           }
                         },

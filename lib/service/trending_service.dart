@@ -58,8 +58,8 @@ class TrendingService {
 
         if (trackJson == null) return null;
 
-        final String streamUrl = await mirrorProvider.buildStreamUrl(trackId);
-        return TrackDetail.fromJson(trackJson, streamUrl: streamUrl);
+        final List<String> streamUrls = await mirrorProvider.buildStreamUrls(trackId);
+        return TrackDetail.fromJson(trackJson, streamUrls: streamUrls);
       } else {
         throw Exception(
           "Failed to load track detail: Status ${response.statusCode}",
