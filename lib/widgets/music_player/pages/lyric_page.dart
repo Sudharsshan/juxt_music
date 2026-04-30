@@ -3,7 +3,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class LyricPage extends StatefulWidget {
-  const LyricPage({super.key});
+  const LyricPage({super.key, this.isFullScreen = false});
+
+  final bool isFullScreen;
 
   @override
   State<LyricPage> createState() => _LyricPageState();
@@ -12,11 +14,14 @@ class LyricPage extends StatefulWidget {
 class _LyricPageState extends State<LyricPage> {
   @override
   Widget build(BuildContext context) {
+    final double blurValue = widget.isFullScreen ? 0 : 12;
     return ClipRRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        filter: ImageFilter.blur(sigmaX: blurValue, sigmaY: blurValue),
         child: Container(
-          color: Colors.white.withAlpha(25),
+          color: widget.isFullScreen
+              ? Colors.transparent
+              : Colors.white.withAlpha(25),
           child: const Center(child: Text('Lyric page')),
         ),
       ),

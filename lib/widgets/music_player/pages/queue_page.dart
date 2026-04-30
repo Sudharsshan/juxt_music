@@ -3,20 +3,30 @@ import 'package:flutter/material.dart';
 import 'package:juxt_music/states/music_que_state.dart';
 
 class QueuePage extends StatelessWidget {
-  const QueuePage({super.key, required this.musicQueState});
+  const QueuePage({
+    super.key,
+    required this.musicQueState,
+    this.isFullScreen = false,
+  });
 
   final MusicQueState musicQueState;
+  final bool isFullScreen;
 
   @override
   Widget build(BuildContext context) {
+    final double blurValue = isFullScreen ? 0 : 12;
     return Stack(
       children: [
         // Background blur matching the player style
         Positioned.fill(
           child: ClipRRect(
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-              child: Container(color: Colors.white.withAlpha(25)),
+              filter: ImageFilter.blur(sigmaX: blurValue, sigmaY: blurValue),
+              child: Container(
+                color: isFullScreen
+                    ? Colors.transparent
+                    : Colors.white.withAlpha(25),
+              ),
             ),
           ),
         ),

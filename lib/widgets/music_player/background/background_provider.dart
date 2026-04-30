@@ -132,21 +132,7 @@ class _BackgroundProviderState extends State<BackgroundProvider> {
       duration: const Duration(milliseconds: 420),
       curve: Curves.easeInOut,
       child: widget.isFullScreen
-          ? Row(
-              children: [
-                Flexible(
-                  flex: 1,
-                  child: CoverBoxMain(
-                    imagePath: artworkPath,
-                    isNetwork: isNetworkArtwork,
-                  ),
-                ),
-                Flexible(
-                  flex: 3,
-                  child: Container(color: activeColorScheme.primary),
-                ),
-              ],
-            )
+          ? fullScreen(context)
           : Column(
               children: [
                 Flexible(
@@ -160,5 +146,9 @@ class _BackgroundProviderState extends State<BackgroundProvider> {
               ],
             ),
     );
+  }
+
+  Widget fullScreen(BuildContext context){
+    return Container(color: background,);
   }
 }
