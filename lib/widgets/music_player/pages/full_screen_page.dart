@@ -64,112 +64,102 @@ class _FullscreenPageState extends State<FullscreenPage> {
     final requiredWidth = screenSize.width * 0.8;
     final requiredHeight = screenSize.height * 0.7;
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(BlurRadius.radius + 2),
-      child: Container(
-        // TO-DO: REMOVE THIS ONCE THE FULL SCREEN WIDGET FOR PLAYER IS FINALIZED
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.white.withAlpha(102), width: 1.2),
-          borderRadius: BorderRadius.circular(BlurRadius.radius),
-        ),
-        child: SizedBox(
-          width: requiredWidth,
-          height: requiredHeight,
-          child: Row(
-            children: [
-              SizedBox(
-                width: 500,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(height: 22),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(BlurRadius.radius),
-                      child: SizedBox(
-                        width: 400,
-                        height: 400,
-                        child: CoverBoxMain(
-                          imagePath:
-                              widget
-                                  .musicQueState
-                                  .currentTrack
-                                  ?.preferredArtwork ??
-                              "",
-                          isNetwork: true,
-                        ),
-                      ),
+    return SizedBox(
+      width: requiredWidth,
+      height: requiredHeight,
+      child: Row(
+        children: [
+          SizedBox(
+            width: 500,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 22),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(BlurRadius.radius),
+                  child: SizedBox(
+                    width: 400,
+                    height: 400,
+                    child: CoverBoxMain(
+                      imagePath:
+                          widget
+                              .musicQueState
+                              .currentTrack
+                              ?.preferredArtwork ??
+                          "",
+                      isNetwork: true,
                     ),
-
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: ControlPage(
-                          playbackState: widget.playBackState,
-                          nextTrack: () {
-                            final success = widget.musicQueState.nextTrack();
-                            if (!success) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                CustomSnackBar(
-                                  message: 'No next track in queue',
-                                ),
-                              );
-                            }
-                          },
-                          prevTrack: () {
-                            final success = widget.musicQueState.prevTrack();
-                            if (!success) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                CustomSnackBar(
-                                  message: 'No previous track in queue',
-                                ),
-                              );
-                            }
-                          },
-                          likeTrack: () {},
-                          isFullScreen: true,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 20),
-                    GlassAnim(
-                      animationDirection: Axis.horizontal,
-                      child: AppBarMain(
-                        pageNotifier: pageNotifier,
-                        children:
-                            MusicPlayerFullScreenIconMap.fullScreenIconMap,
-                        requiredWidth: 50,
-                      ),
+    
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: ControlPage(
+                      playbackState: widget.playBackState,
+                      nextTrack: () {
+                        final success = widget.musicQueState.nextTrack();
+                        if (!success) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            CustomSnackBar(
+                              message: 'No next track in queue',
+                            ),
+                          );
+                        }
+                      },
+                      prevTrack: () {
+                        final success = widget.musicQueState.prevTrack();
+                        if (!success) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            CustomSnackBar(
+                              message: 'No previous track in queue',
+                            ),
+                          );
+                        }
+                      },
+                      likeTrack: () {},
+                      isFullScreen: true,
                     ),
-                    Expanded(
-                      child: PageView(
-                        controller: pageController,
-                        onPageChanged: (value) => updateNotifier(value),
-                        children: [
-                          LyricPage(
-                            isFullScreen:
-                                true, // This widget is build since the main widget is already full screen
-                          ),
-
-                          QueuePage(
-                            musicQueState: widget.musicQueState,
-                            isFullScreen: true,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 20),
+                GlassAnim(
+                  animationDirection: Axis.horizontal,
+                  child: AppBarMain(
+                    pageNotifier: pageNotifier,
+                    children:
+                        MusicPlayerFullScreenIconMap.fullScreenIconMap,
+                    requiredWidth: 50,
+                  ),
+                ),
+                Expanded(
+                  child: PageView(
+                    controller: pageController,
+                    onPageChanged: (value) => updateNotifier(value),
+                    children: [
+                      LyricPage(
+                        isFullScreen:
+                            true, // This widget is build since the main widget is already full screen
+                      ),
+    
+                      QueuePage(
+                        musicQueState: widget.musicQueState,
+                        isFullScreen: true,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
