@@ -126,13 +126,12 @@ class _BackgroundProviderState extends State<BackgroundProvider> {
   Widget build(BuildContext context) {
     final artworkPath = _resolveArtworkPath(widget.trackState);
     final isNetworkArtwork = _isNetworkArtwork(widget.trackState);
-    final activeColorScheme = imageColorScheme ?? Theme.of(context).colorScheme;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 420),
       curve: Curves.easeInOut,
       child: widget.isFullScreen
-          ? fullScreen(context)
+          ? Container(color: background)
           : Column(
               children: [
                 Flexible(
@@ -146,9 +145,5 @@ class _BackgroundProviderState extends State<BackgroundProvider> {
               ],
             ),
     );
-  }
-
-  Widget fullScreen(BuildContext context){
-    return Container(color: background,);
   }
 }
