@@ -171,14 +171,12 @@ class _SubState extends State<Sub> {
         ),
 
         // Music Player widget
-        Positioned(
-          top: 0,
-          right: 0,
+        Positioned.fill(
           child: ListenableBuilder(
             listenable: musicQueState,
             builder: (context, child) {
               final track = musicQueState.currentTrack;
-              if (track == null) return SizedBox.shrink();
+              if (track == null) return const SizedBox.shrink();
 
               return Padding(
                 padding: const EdgeInsets.all(12.0),

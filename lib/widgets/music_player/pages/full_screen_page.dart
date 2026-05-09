@@ -47,22 +47,32 @@ class _FullscreenPageState extends State<FullscreenPage> {
   }
 
   void changePage() {
-    setState(() {
-      pageController.animateToPage(
-        pageNotifier.value,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    });
+    if (!pageController.hasClients) return;
+
+    final targetPage = pageNotifier.value;
+    final currentPage = pageController.page?.round();
+    if (currentPage == targetPage) return;
+
+    pageController.animateToPage(
+      targetPage,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
   }
 
   void updateNotifier(int value) {
     if (value == pageNotifier.value) return;
 
     if (kDebugMode) print("Page manual change (fullscreen) to: $value");
-    setState(() {
-      pageNotifier.value = value;
-    });
+    pageNotifier.value = value;
+  }
+
+  @override
+  void dispose() {
+    pageNotifier.removeListener(changePage);
+    pageController.dispose();
+    pageNotifier.dispose();
+    super.dispose();
   }
 
   @override

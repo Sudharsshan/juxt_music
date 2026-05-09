@@ -4,12 +4,17 @@ import 'package:juxt_music/states/selected_track_state.dart';
 
 class PlayerPlaybackState extends ChangeNotifier {
   final AudioPlayer _audioPlayer = AudioPlayer();
-  
+
   bool isPlaying = false;
   double currentPosition = 0.0;
   double totalDuration = 0.0;
+  double _volume = 1.0;
+  double _lastAudibleVolume = 1.0;
   SelectedTrackState? currentTrack;
   String? _loadedStreamUrl;
+
+  double get volume => _volume;
+  bool get isMuted => _volume <= 0.0;
 
   PlayerPlaybackState() {
     // Listen to position changes
@@ -51,6 +56,28 @@ class PlayerPlaybackState extends ChangeNotifier {
 
   void updatePosition(double position) {
     _audioPlayer.seek(Duration(seconds: position.toInt()));
+  }
+
+  Future<void> setVolume(double value) async {
+    final nextVolume = value.clamp(0.0, 1.0).toDouble();
+    _volume = nextVolume;
+
+    if (nextVolume > 0.0) {
+      _lastAudibleVolume = nextVolume;
+    }
+
+    await _audioPlayer.setVolume(nextVolume);
+    notifyListeners();
+  }
+
+  Future<void> toggleMute() async {
+    if (isMuted) {
+      await setVolume(_lastAudibleVolume > 0.0 ? _lastAudibleVolume : 1.0);
+      return;
+    }
+
+    _lastAudibleVolume = _volume > 0.0 ? _volume : 1.0;
+    await setVolume(0.0);
   }
 
   Future<void> setTrack(SelectedTrackState track, {Function(String)? onError}) async {
