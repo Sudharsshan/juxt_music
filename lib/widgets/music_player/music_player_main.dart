@@ -29,6 +29,10 @@ class MusicPlayerMain extends StatefulWidget {
 }
 
 class _MusicPlayerState extends State<MusicPlayerMain> {
+  static const double _miniPlayerWidth = 400;
+  static const double _playerOuterPadding = 24;
+  static const double _fullScreenWidthFactor = 1.0;
+
   /// button to check if music player is full screen or not
   bool isMusicPlayerFullScreen = false; // by default in mini-player mode
 
@@ -113,6 +117,50 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
     });
   }
 
+  double _playerHeightFor(Size screenSize) => screenSize.height - _playerOuterPadding;
+
+  double _playerWidthFor(Size screenSize) {
+    final fullScreenWidth = (screenSize.width * _fullScreenWidthFactor).clamp(
+      _miniPlayerWidth,
+      screenSize.width - _playerOuterPadding,
+    );
+
+    return isMusicPlayerFullScreen ? fullScreenWidth : _miniPlayerWidth;
+  }
+
+  Widget _buildMiniPlayerPageView() {
+    return PageView(
+      key: const ValueKey('mini-player-page-view'),
+      controller: _pageController,
+      onPageChanged: (value) => updateNotifier(value),
+      children: [
+        LyricPage(),
+        ControlPage(
+          playbackState: playbackState,
+          nextTrack: () {
+            final success = widget.musicQueState.nextTrack();
+            if (!success) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(CustomSnackBar(message: 'No next track in queue'));
+            }
+          },
+          prevTrack: () {
+            final success = widget.musicQueState.prevTrack();
+            if (!success) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                CustomSnackBar(message: 'No previous track in queue'),
+              );
+            }
+          },
+          likeTrack: () {},
+          isFullScreen: isMusicPlayerFullScreen,
+        ),
+        QueuePage(musicQueState: widget.musicQueState),
+      ],
+    );
+  }
+
   @override
   void dispose() {
     widget.musicQueState.removeListener(_onQueueChanged);
@@ -126,149 +174,133 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
   @override
   Widget build(BuildContext context) {
     final trackState = widget.musicQueState.currentTrack!;
+    final screenSize = MediaQuery.sizeOf(context);
+    final playerWidth = _playerWidthFor(screenSize);
+    final playerHeight = _playerHeightFor(screenSize);
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(BlurRadius.radius),
-      child: Container(
-        height: MediaQuery.sizeOf(context).height - 24, // Padding space
-        width: isMusicPlayerFullScreen
-            ? MediaQuery.sizeOf(context).width - 24
-            : 400,
-        decoration: BoxDecoration(
-          border: Border.all(
-            width: 2,
-            color: Theme.of(context).textTheme.bodyLarge!.color!.withAlpha(102),
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 420),
+      curve: Curves.easeInOutCubic,
+      alignment: Alignment.center,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(BlurRadius.radius),
+        child: Container(
+          height: playerHeight,
+          width: playerWidth,
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 2,
+              color: Theme.of(
+                context,
+              ).textTheme.bodyLarge!.color!.withAlpha(102),
+            ),
+            borderRadius: BorderRadius.circular(BlurRadius.radius),
           ),
-          borderRadius: BorderRadius.circular(BlurRadius.radius),
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Background decoration
-            BackgroundProvider(
-              trackState: trackState,
-              isFullScreen: isMusicPlayerFullScreen,
-            ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Background decoration
+              BackgroundProvider(
+                trackState: trackState,
+                isFullScreen: isMusicPlayerFullScreen,
+              ),
 
-            // the player UI
-            Hero(
-              tag: "music_player_max",
-              flightShuttleBuilder:
-                  (
-                    flightContext,
-                    animation,
-                    direction,
-                    fromContext,
-                    toContext,
-                  ) {
-                    return Material(
-                      color: Colors.transparent,
-                      child: toContext.widget,
-                    );
-                  },
-              child: isMusicPlayerFullScreen
-                  ? FullscreenPage(
-                      musicQueState: widget.musicQueState,
-                      playBackState: playbackState,
-                    )
-                  : PageView(
-                      controller: _pageController,
-                      onPageChanged: (value) => updateNotifier(value),
-                      children: [
-                        // The lyrics page
-                        LyricPage(),
-
-                        // the music control page
-                        ControlPage(
-                          playbackState: playbackState,
-                          nextTrack: () {
-                            final success = widget.musicQueState.nextTrack();
-                            if (!success) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                CustomSnackBar(
-                                  message: 'No next track in queue',
-                                ),
-                              );
-                            }
-                          },
-                          prevTrack: () {
-                            final success = widget.musicQueState.prevTrack();
-                            if (!success) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                CustomSnackBar(
-                                  message: 'No previous track in queue',
-                                ),
-                              );
-                            }
-                          },
-                          likeTrack: () {},
-                          isFullScreen: isMusicPlayerFullScreen,
-                        ),
-
-                        // the queue page
-                        QueuePage(musicQueState: widget.musicQueState),
-                      ],
+              // the player UI
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 360),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                layoutBuilder: (currentChild, previousChildren) {
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      ...previousChildren,
+                      if (currentChild != null) currentChild,
+                    ],
+                  );
+                },
+                transitionBuilder: (child, animation) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SizeTransition(
+                      sizeFactor: animation,
+                      axis: Axis.horizontal,
+                      axisAlignment: -1,
+                      child: child,
                     ),
-            ),
+                  );
+                },
+                child:
+                    isMusicPlayerFullScreen
+                        ? FullscreenPage(
+                          key: const ValueKey('fullscreen-player'),
+                          musicQueState: widget.musicQueState,
+                          playBackState: playbackState,
+                          availableWidth: playerWidth,
+                          availableHeight: playerHeight,
+                        )
+                        : _buildMiniPlayerPageView(),
+              ),
 
-            // Top App bar
-            isMusicPlayerFullScreen
-                ? SizedBox.shrink()
-                : Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: AppBarBlur(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          mainAxisSize: MainAxisSize.max,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const SizedBox(width: 5),
+              // Top App bar
+              isMusicPlayerFullScreen
+                  ? const SizedBox.shrink()
+                  : Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: AppBarBlur(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const SizedBox(width: 5),
 
-                            IconButton(
-                              onPressed: updateMusicPlayerState,
-                              icon: const FaIcon(FontAwesomeIcons.chevronDown),
-                            ),
-
-                            const SizedBox(width: 15),
-
-                            GlassAnim(
-                              animationDirection: Axis.horizontal,
-                              child: AppBarMain(
-                                pageNotifier: pageNotifier,
-                                children: MusicPlayerIconMap.musicPlayerIcons,
-                                requiredWidth: 50,
+                              IconButton(
+                                onPressed: updateMusicPlayerState,
+                                icon: const FaIcon(
+                                  FontAwesomeIcons.chevronDown,
+                                ),
                               ),
-                            ),
+                              const SizedBox(width: 15),
 
-                            const SizedBox(width: 15),
-
-                            const Opacity(
-                              opacity: 0,
-                              child: IgnorePointer(
-                                child: FaIcon(FontAwesomeIcons.chevronDown),
+                              GlassAnim(
+                                animationDirection: Axis.horizontal,
+                                child: AppBarMain(
+                                  pageNotifier: pageNotifier,
+                                  children: MusicPlayerIconMap.musicPlayerIcons,
+                                  requiredWidth: 50,
+                                ),
                               ),
-                            ),
-                          ],
+
+                              const SizedBox(width: 15),
+
+                              const Opacity(
+                                opacity: 0,
+                                child: IgnorePointer(
+                                  child: FaIcon(FontAwesomeIcons.chevronDown),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-
-            isMusicPlayerFullScreen
-                ? Positioned(
-                  top: 30,
-                  right: 30,
-                    child: IconButton(
-                      onPressed: updateMusicPlayerState,
-                      icon: Icon(Icons.fit_screen),
-                    ),
-                  )
-                : SizedBox.shrink(),
-          ],
+              isMusicPlayerFullScreen
+                  ? Positioned(
+                      top: 30,
+                      right: 30,
+                      child: IconButton(
+                        onPressed: updateMusicPlayerState,
+                        icon: const Icon(Icons.fit_screen),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ],
+          ),
         ),
       ),
     );

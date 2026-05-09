@@ -16,7 +16,7 @@ class _GlassAnimState extends State<GlassAnim>
   late AnimationController expandIt;
   late Animation<double> animateIt;
 
-  final double minStartWidth = 12;
+  final double minStartExtent = 12;
 
   @override
   void initState() {
@@ -43,14 +43,34 @@ class _GlassAnimState extends State<GlassAnim>
   }
 
   @override
+  void didUpdateWidget(covariant GlassAnim oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final childChanged =
+        oldWidget.child.runtimeType != widget.child.runtimeType ||
+        oldWidget.child.key != widget.child.key;
+
+    if (childChanged || oldWidget.animationDirection != widget.animationDirection) {
+      expandIt
+        ..value = 0
+        ..forward();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final constraints =
+        widget.animationDirection == Axis.horizontal
+            ? BoxConstraints(minWidth: minStartExtent)
+            : BoxConstraints(minHeight: minStartExtent);
+
     return GlassMain(
       child: ConstrainedBox(
-        constraints: BoxConstraints(minWidth: minStartWidth),
+        constraints: constraints,
         child: SizeTransition(
           sizeFactor: animateIt,
           axisAlignment: 0.0,
-          axis: Axis.horizontal,
+          axis: widget.animationDirection,
           child: widget.child,
         ),
       ),
