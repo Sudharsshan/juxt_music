@@ -6,7 +6,6 @@ import 'package:juxt_music/widgets/glass/glass_anim.dart';
 import 'package:juxt_music/widgets/music_player/background/background_provider.dart';
 import 'package:juxt_music/global_var/music_player_appBar/music_player_icon_map.dart';
 import 'package:juxt_music/states/music_que_state.dart';
-import 'dart:developer' as developer;
 
 class DefaultPlayerChrome extends StatelessWidget {
   const DefaultPlayerChrome({
