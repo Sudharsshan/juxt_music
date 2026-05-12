@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:juxt_music/states/player_playback_state.dart';
+import 'package:juxt_music/widgets/action_buttons/mini_action_buttons.dart';
 import 'package:juxt_music/widgets/cover_art/cover_box_main.dart';
 import 'package:juxt_music/widgets/glass/glass_anim.dart';
 import 'package:juxt_music/widgets/music_player/controller/player_controller.dart';
@@ -35,10 +36,7 @@ class MiniPlayerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: 80,
-        maxWidth: availableWidth,
-      ),
+      constraints: BoxConstraints(maxHeight: 80, maxWidth: availableWidth),
       child: ListenableBuilder(
         listenable: playbackState,
         builder: (context, child) {
@@ -92,7 +90,7 @@ class MiniPlayerPage extends StatelessWidget {
           );
 
           final controlButtons = PlayerController(
-            isCompact: true,
+            isCompact: false,
             buttons: {
               FontAwesomeIcons.shuffle: () {},
               FontAwesomeIcons.backward: prevTrack,
@@ -104,23 +102,23 @@ class MiniPlayerPage extends StatelessWidget {
           );
 
           final groupedActions = [
-            _MiniActionButton(
+            MiniActionButton(
               tooltip: 'More options',
               icon: Icons.more_horiz_rounded,
               onPressed: onMorePressed,
             ),
-            _MiniActionButton(
+            MiniActionButton(
               tooltip: 'Favorite',
               icon: Icons.star_outline_rounded,
               onPressed: onLikeTrack,
             ),
-            const SizedBox(width: 20, height: 20),
-            _MiniActionButton(
+            const SizedBox(width: 10, height: 20),
+            MiniActionButton(
               tooltip: 'Cast',
               icon: Icons.cast_rounded,
               onPressed: onCastPressed,
             ),
-            _MiniActionButton(
+            MiniActionButton(
               tooltip: isMuted ? 'Unmute' : 'Mute',
               icon: isMuted
                   ? Icons.volume_off_rounded
@@ -129,13 +127,13 @@ class MiniPlayerPage extends StatelessWidget {
                 playbackState.toggleMute();
               },
             ),
-            const SizedBox(width: 20, height: 20),
-            _MiniActionButton(
+            const SizedBox(width: 10, height: 20),
+            MiniActionButton(
               tooltip: 'Open lyrics',
               icon: Icons.lyrics_outlined,
               onPressed: onOpenLyrics,
             ),
-            _MiniActionButton(
+            MiniActionButton(
               tooltip: 'Open queue',
               icon: Icons.menu_rounded,
               onPressed: onOpenQueue,
@@ -226,34 +224,6 @@ class MiniPlayerPage extends StatelessWidget {
             imagePath: artwork,
             isNetwork: artwork.startsWith('http'),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MiniActionButton extends StatelessWidget {
-  const _MiniActionButton({
-    required this.tooltip,
-    required this.icon,
-    required this.onPressed,
-  });
-
-  final String tooltip;
-  final IconData icon;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: IconButton(
-        onPressed: onPressed,
-        visualDensity: VisualDensity.compact,
-        icon: Icon(
-          icon,
-          size: 20,
-          color: Theme.of(context).textTheme.bodyLarge?.color,
         ),
       ),
     );
