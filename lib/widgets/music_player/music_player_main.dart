@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:juxt_music/global_var/blur_radius.dart';
 import 'package:juxt_music/global_var/music_player_appBar/music_player_icon_map.dart';
+import 'package:juxt_music/global_var/music_player_appBar/player_view_mode.dart';
 import 'package:juxt_music/states/music_que_state.dart';
 import 'package:juxt_music/states/player_playback_state.dart';
 import 'package:juxt_music/widgets/app_bar/app_bar_blur.dart';
@@ -17,8 +18,6 @@ import 'package:juxt_music/widgets/music_player/pages/full_screen_page.dart';
 import 'package:juxt_music/widgets/music_player/pages/lyric_page.dart';
 import 'package:juxt_music/widgets/music_player/pages/mini_player_page.dart';
 import 'package:juxt_music/widgets/music_player/pages/queue_page.dart';
-
-enum _PlayerViewMode { mini, defaultPlayer, fullscreen }
 
 /// Main [MusicPlayerMain] widget that swaps between the compact player,
 /// the tabbed default player, and the fullscreen player.
@@ -37,12 +36,13 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
   static const double _miniPlayerHeight = 84;
   static const double _defaultPlayerWidth = 400;
   static const double _playerOuterPadding = 24;
+  static const double _overlayInset = 12;
 
   final ValueNotifier<int> pageNotifier = ValueNotifier<int>(1);
   final PlayerPlaybackState playbackState = PlayerPlaybackState();
 
   late final PageController _pageController;
-  _PlayerViewMode _viewMode = _PlayerViewMode.mini;
+  PlayerViewMode _viewMode = PlayerViewMode.mini;
 
   @override
   void initState() {
@@ -123,10 +123,10 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
   }
 
   void _openMiniPlayer() {
-    if (_viewMode == _PlayerViewMode.mini) return;
+    if (_viewMode == PlayerViewMode.mini) return;
 
     setState(() {
-      _viewMode = _PlayerViewMode.mini;
+      _viewMode = PlayerViewMode.mini;
     });
   }
 
@@ -135,9 +135,9 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
       pageNotifier.value = initialPage;
     }
 
-    if (_viewMode != _PlayerViewMode.defaultPlayer) {
+    if (_viewMode != PlayerViewMode.defaultPlayer) {
       setState(() {
-        _viewMode = _PlayerViewMode.defaultPlayer;
+        _viewMode = PlayerViewMode.defaultPlayer;
       });
     }
 
@@ -149,19 +149,25 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
   }
 
   void _openFullScreenPlayer() {
-    if (_viewMode == _PlayerViewMode.fullscreen) return;
+    if (_viewMode == PlayerViewMode.fullscreen) return;
 
     setState(() {
-      _viewMode = _PlayerViewMode.fullscreen;
+      _viewMode = PlayerViewMode.fullscreen;
     });
   }
 
   double _playerHeightFor(Size screenSize) {
-    if (_viewMode == _PlayerViewMode.mini) {
-      return _miniPlayerHeight;
+    switch (_viewMode) {
+      case PlayerViewMode.mini:
+        return _miniPlayerHeight;
+      case PlayerViewMode.defaultPlayer:
+        return math.max(
+          0.0,
+          screenSize.height - (_playerOuterPadding + _overlayInset),
+        ).toDouble();
+      case PlayerViewMode.fullscreen:
+        return screenSize.height;
     }
-
-    return math.max(0.0, screenSize.height - _playerOuterPadding).toDouble();
   }
 
   double _miniPlayerWidthFor(Size screenSize) {
@@ -171,41 +177,42 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
     }
 
     final preferredWidth = screenSize.width * 0.84;
-    return preferredWidth.clamp(
-      _miniPlayerMinWidth,
-      math.min(_miniPlayerMaxWidth, maxWidth),
-    ).toDouble();
+    return preferredWidth
+        .clamp(_miniPlayerMinWidth, math.min(_miniPlayerMaxWidth, maxWidth))
+        .toDouble();
   }
 
   double _playerWidthFor(Size screenSize) {
     final maxWidth = math.max(0.0, screenSize.width - _playerOuterPadding);
 
     switch (_viewMode) {
-      case _PlayerViewMode.mini:
+      case PlayerViewMode.mini:
         return _miniPlayerWidthFor(screenSize);
-      case _PlayerViewMode.defaultPlayer:
+      case PlayerViewMode.defaultPlayer:
         return math.min(_defaultPlayerWidth, maxWidth).toDouble();
-      case _PlayerViewMode.fullscreen:
-        return maxWidth;
+      case PlayerViewMode.fullscreen:
+        return screenSize.width;
     }
   }
 
   Widget _buildDefaultPlayerPageView() {
-    return PageView(
-      key: const ValueKey('default-player-page-view'),
-      controller: _pageController,
-      onPageChanged: updateNotifier,
-      children: [
-        LyricPage(),
-        ControlPage(
-          playbackState: playbackState,
-          nextTrack: _nextTrack,
-          prevTrack: _prevTrack,
-          likeTrack: () {},
-          isFullScreen: false,
-        ),
-        QueuePage(musicQueState: widget.musicQueState),
-      ],
+    return SizedBox.expand(
+      child: PageView(
+        key: const ValueKey('default-player-page-view'),
+        controller: _pageController,
+        onPageChanged: updateNotifier,
+        children: [
+          LyricPage(),
+          ControlPage(
+            playbackState: playbackState,
+            nextTrack: _nextTrack,
+            prevTrack: _prevTrack,
+            likeTrack: () {},
+            isFullScreen: false,
+          ),
+          QueuePage(musicQueState: widget.musicQueState),
+        ],
+      ),
     );
   }
 
@@ -282,41 +289,61 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
   Widget _buildFullScreenPlayer(double width, double height) {
     final trackState = widget.musicQueState.currentTrack!;
 
-    return ClipRRect(
+    return SizedBox(
       key: const ValueKey('fullscreen-player'),
-      borderRadius: BorderRadius.circular(BlurRadius.radius),
-      child: Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          border: Border.all(
-            width: 2,
-            color: Theme.of(context).textTheme.bodyLarge!.color!.withAlpha(102),
+      width: width,
+      height: height,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          BackgroundProvider(trackState: trackState, isFullScreen: true),
+          FullscreenPage(
+            musicQueState: widget.musicQueState,
+            playBackState: playbackState,
+            availableWidth: width,
+            availableHeight: height,
           ),
-          borderRadius: BorderRadius.circular(BlurRadius.radius),
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            BackgroundProvider(trackState: trackState, isFullScreen: true),
-            FullscreenPage(
-              musicQueState: widget.musicQueState,
-              playBackState: playbackState,
-              availableWidth: width,
-              availableHeight: height,
+          Positioned(
+            top: 30,
+            right: 30,
+            child: IconButton(
+              onPressed: () => _openDefaultPlayer(initialPage: pageNotifier.value),
+              tooltip: 'Exit fullscreen',
+              icon: const Icon(Icons.close_fullscreen),
             ),
-            Positioned(
-              top: 30,
-              right: 30,
-              child: IconButton(
-                onPressed:
-                    () => _openDefaultPlayer(initialPage: pageNotifier.value),
-                tooltip: 'Exit fullscreen',
-                icon: const Icon(Icons.close_fullscreen),
-              ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnimatedPlayer(Widget activePlayer) {
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 420),
+      curve: Curves.easeInOutCubic,
+      alignment: Alignment.center,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 360),
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeInCubic,
+        layoutBuilder: (currentChild, previousChildren) {
+          return Stack(
+            alignment: Alignment.center,
+            children: [...previousChildren, if (currentChild != null) currentChild],
+          );
+        },
+        transitionBuilder: (child, animation) {
+          return FadeTransition(
+            opacity: animation,
+            child: SizeTransition(
+              sizeFactor: animation,
+              axis: Axis.horizontal,
+              axisAlignment: -1,
+              child: child,
             ),
-          ],
-        ),
+          );
+        },
+        child: activePlayer,
       ),
     );
   }
@@ -339,7 +366,7 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
 
     final Widget activePlayer;
     switch (_viewMode) {
-      case _PlayerViewMode.mini:
+      case PlayerViewMode.mini:
         activePlayer = MiniPlayerPage(
           key: const ValueKey('mini-player'),
           playbackState: playbackState,
@@ -353,46 +380,32 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
           onMorePressed: () {},
           onCastPressed: () {},
         );
-      case _PlayerViewMode.defaultPlayer:
+      case PlayerViewMode.defaultPlayer:
         activePlayer = _buildDefaultPlayerChrome(
           width: playerWidth,
           height: playerHeight,
           child: _buildDefaultPlayerPageView(),
         );
-      case _PlayerViewMode.fullscreen:
+      case PlayerViewMode.fullscreen:
         activePlayer = _buildFullScreenPlayer(playerWidth, playerHeight);
     }
 
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 420),
-      curve: Curves.easeInOutCubic,
-      alignment: Alignment.center,
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 360),
-        switchInCurve: Curves.easeOutCubic,
-        switchOutCurve: Curves.easeInCubic,
-        layoutBuilder: (currentChild, previousChildren) {
-          return Stack(
-            alignment: Alignment.center,
-            children: [
-              ...previousChildren,
-              if (currentChild != null) currentChild,
-            ],
-          );
-        },
-        transitionBuilder: (child, animation) {
-          return FadeTransition(
-            opacity: animation,
-            child: SizeTransition(
-              sizeFactor: animation,
-              axis: Axis.horizontal,
-              axisAlignment: -1,
-              child: child,
-            ),
-          );
-        },
-        child: activePlayer,
-      ),
-    );
+    switch (_viewMode) {
+      case PlayerViewMode.mini:
+        return Positioned(
+          left: 0,
+          right: 0,
+          bottom: 15,
+          child: Center(child: _buildAnimatedPlayer(activePlayer)),
+        );
+      case PlayerViewMode.defaultPlayer:
+        return Positioned(
+          top: _overlayInset,
+          right: _overlayInset,
+          child: _buildAnimatedPlayer(activePlayer),
+        );
+      case PlayerViewMode.fullscreen:
+        return Positioned.fill(child: _buildAnimatedPlayer(activePlayer));
+    }
   }
 }

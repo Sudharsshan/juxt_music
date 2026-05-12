@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:juxt_music/global_var/music_player_appBar/player_view_mode.dart';
 import 'package:juxt_music/models/track/track_detail.dart';
 import 'package:juxt_music/models/track/track_preview.dart';
 import 'package:juxt_music/pages/controller/page_controller_custom.dart';
@@ -38,6 +39,8 @@ class _SubState extends State<Sub> {
   /// selected track to play
   final MusicQueState musicQueState = MusicQueState();
 
+  ValueNotifier<Enum> playerState = ValueNotifier<Enum>(PlayerViewMode.mini);
+
   @override
   void initState() {
     super.initState();
@@ -71,16 +74,17 @@ class _SubState extends State<Sub> {
   /// after selection.
   Future<void> _hydrateSelectedTrack() async {
     final selected = musicQueState.currentTrack;
-    if (selected == null || !selected.isLoadingDetail || selected.detail != null) {
+    if (selected == null ||
+        !selected.isLoadingDetail ||
+        selected.detail != null) {
       return;
     }
 
     final cachedDetail = _detailCache[selected.preview.id];
     if (cachedDetail != null) {
-      musicQueState.updateTrack(selected.copyWith(
-        detail: cachedDetail,
-        isLoadingDetail: false,
-      ));
+      musicQueState.updateTrack(
+        selected.copyWith(detail: cachedDetail, isLoadingDetail: false),
+      );
       return;
     }
 
@@ -93,20 +97,22 @@ class _SubState extends State<Sub> {
     if (!mounted) return;
 
     final latestSelected = musicQueState.currentTrack;
-    if (latestSelected == null || latestSelected.preview.id != requestedTrackId) {
+    if (latestSelected == null ||
+        latestSelected.preview.id != requestedTrackId) {
       return;
     }
 
     if (detail == null) {
-      musicQueState.updateTrack(latestSelected.copyWith(isLoadingDetail: false));
+      musicQueState.updateTrack(
+        latestSelected.copyWith(isLoadingDetail: false),
+      );
       return;
     }
 
     _detailCache[requestedTrackId] = detail;
-    musicQueState.updateTrack(latestSelected.copyWith(
-      detail: detail,
-      isLoadingDetail: false,
-    ));
+    musicQueState.updateTrack(
+      latestSelected.copyWith(detail: detail, isLoadingDetail: false),
+    );
   }
 
   @override
@@ -120,72 +126,72 @@ class _SubState extends State<Sub> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: AlignmentGeometry.center,
-      children: [
-        // Page controller custom
-        PageControllerCustom(
-          pageNotifier: pageNotifier,
-          trackDetails: trackDetails,
-          isDataReady: isDetailsReady,
-          musicQueState: musicQueState,
-        ),
-        // App Bar
-        Positioned(
-          top: 0,
-          right: 0,
-          left: 0,
-          child: AppBarBlur(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(width: 5),
+    return SizedBox.expand(
+      child: Stack(
+        fit: StackFit.expand,
+        alignment: Alignment.center,
+        children: [
+          // Page controller custom
+          Positioned.fill(
+            child: PageControllerCustom(
+              pageNotifier: pageNotifier,
+              trackDetails: trackDetails,
+              isDataReady: isDetailsReady,
+              musicQueState: musicQueState,
+            ),
+          ),
+          // App Bar
+          Positioned(
+            top: 0,
+            right: 0,
+            left: 0,
+            child: AppBarBlur(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(width: 5),
 
-                  const FrontAndBack(),
+                    const FrontAndBack(),
 
-                  const SizedBox(width: 15),
+                    const SizedBox(width: 15),
 
-                  GlassAnim(
-                    animationDirection: Axis.horizontal,
-                    child: AppBarMain(
-                      pageNotifier: pageNotifier,
-                      children: IconsMap.barIcons,
-                      requiredWidth: 50, // good value for just icons
+                    GlassAnim(
+                      animationDirection: Axis.horizontal,
+                      child: AppBarMain(
+                        pageNotifier: pageNotifier,
+                        children: IconsMap.barIcons,
+                        requiredWidth: 50, // good value for just icons
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(width: 20),
+                    const SizedBox(width: 20),
 
-                  const Opacity(
-                    opacity: 0,
-                    child: IgnorePointer(child: FrontAndBack()),
-                  ),
-                ],
+                    const Opacity(
+                      opacity: 0,
+                      child: IgnorePointer(child: FrontAndBack()),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
 
-        // Music Player widget
-        Positioned.fill(
-          child: ListenableBuilder(
+          // Music Player widget
+          ListenableBuilder(
             listenable: musicQueState,
             builder: (context, child) {
               final track = musicQueState.currentTrack;
               if (track == null) return const SizedBox.shrink();
 
-              return Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: MusicPlayerMain(musicQueState: musicQueState),
-              );
+              return MusicPlayerMain(musicQueState: musicQueState);
             },
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

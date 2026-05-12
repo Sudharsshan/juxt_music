@@ -35,7 +35,10 @@ class MiniPlayerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: 80),
+      constraints: BoxConstraints(
+        maxHeight: 80,
+        maxWidth: availableWidth,
+      ),
       child: ListenableBuilder(
         listenable: playbackState,
         builder: (context, child) {
@@ -142,38 +145,41 @@ class MiniPlayerPage extends StatelessWidget {
           if (isTightLayout) {
             return GlassAnim(
               animationDirection: Axis.horizontal,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        _buildArtwork(onOpenPlayer, artwork),
-                        const SizedBox(width: 12),
-                        Expanded(child: infoSection),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(child: controlButtons),
-                        const SizedBox(width: 12),
-                        Flexible(
-                          child: Wrap(
-                            alignment: WrapAlignment.end,
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: groupedActions,
+              child: SizedBox(
+                width: availableWidth,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          _buildArtwork(onOpenPlayer, artwork),
+                          const SizedBox(width: 12),
+                          Expanded(child: infoSection),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(child: controlButtons),
+                          const SizedBox(width: 12),
+                          Flexible(
+                            child: Wrap(
+                              alignment: WrapAlignment.end,
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: groupedActions,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );

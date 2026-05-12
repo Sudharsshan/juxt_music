@@ -1,0 +1,1 @@
+enum PlayerViewMode { mini, defaultPlayer, fullscreen }
