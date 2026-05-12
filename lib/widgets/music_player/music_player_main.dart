@@ -2,22 +2,15 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:juxt_music/global_var/blur_radius.dart';
-import 'package:juxt_music/global_var/music_player_appBar/music_player_icon_map.dart';
 import 'package:juxt_music/global_var/music_player_appBar/player_view_mode.dart';
 import 'package:juxt_music/states/music_que_state.dart';
 import 'package:juxt_music/states/player_playback_state.dart';
-import 'package:juxt_music/widgets/app_bar/app_bar_blur.dart';
-import 'package:juxt_music/widgets/app_bar/app_bar_main.dart';
 import 'package:juxt_music/widgets/custom_snackbar/custom_snackbar.dart';
-import 'package:juxt_music/widgets/glass/glass_anim.dart';
-import 'package:juxt_music/widgets/music_player/background/background_provider.dart';
-import 'package:juxt_music/widgets/music_player/pages/control_page.dart';
-import 'package:juxt_music/widgets/music_player/pages/full_screen_page.dart';
-import 'package:juxt_music/widgets/music_player/pages/lyric_page.dart';
+import 'package:juxt_music/widgets/music_player/pages/default_player_page_view.dart';
+import 'package:juxt_music/widgets/music_player/default_player_chrome.dart';
+import 'package:juxt_music/widgets/music_player/fullscreen_player.dart';
+import 'package:juxt_music/widgets/music_player/animated_player.dart';
 import 'package:juxt_music/widgets/music_player/pages/mini_player_page.dart';
-import 'package:juxt_music/widgets/music_player/pages/queue_page.dart';
 
 /// Main [MusicPlayerMain] widget that swaps between the compact player,
 /// the tabbed default player, and the fullscreen player.
@@ -161,10 +154,9 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
       case PlayerViewMode.mini:
         return _miniPlayerHeight;
       case PlayerViewMode.defaultPlayer:
-        return math.max(
-          0.0,
-          screenSize.height - (_playerOuterPadding + _overlayInset),
-        ).toDouble();
+        return math
+            .max(0.0, screenSize.height - (_playerOuterPadding + _overlayInset))
+            .toDouble();
       case PlayerViewMode.fullscreen:
         return screenSize.height;
     }
@@ -196,23 +188,12 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
   }
 
   Widget _buildDefaultPlayerPageView() {
-    return SizedBox.expand(
-      child: PageView(
-        key: const ValueKey('default-player-page-view'),
-        controller: _pageController,
-        onPageChanged: updateNotifier,
-        children: [
-          LyricPage(),
-          ControlPage(
-            playbackState: playbackState,
-            nextTrack: _nextTrack,
-            prevTrack: _prevTrack,
-            likeTrack: () {},
-            isFullScreen: false,
-          ),
-          QueuePage(musicQueState: widget.musicQueState),
-        ],
-      ),
+    return DefaultPlayerPageView(
+      pageController: _pageController,
+      pageNotifier: pageNotifier,
+      playbackState: playbackState,
+      musicQueState: widget.musicQueState,
+      updateNotifier: updateNotifier,
     );
   }
 
@@ -221,131 +202,30 @@ class _MusicPlayerState extends State<MusicPlayerMain> {
     required double width,
     required double height,
   }) {
-    final trackState = widget.musicQueState.currentTrack!;
-
-    return ClipRRect(
-      key: const ValueKey('default-player'),
-      borderRadius: BorderRadius.circular(BlurRadius.radius),
-      child: Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          border: Border.all(
-            width: 2,
-            color: Theme.of(context).textTheme.bodyLarge!.color!.withAlpha(102),
-          ),
-          borderRadius: BorderRadius.circular(BlurRadius.radius),
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            BackgroundProvider(trackState: trackState, isFullScreen: false),
-            child,
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: AppBarBlur(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const SizedBox(width: 5),
-                      IconButton(
-                        onPressed: _openMiniPlayer,
-                        tooltip: 'Collapse player',
-                        icon: const FaIcon(FontAwesomeIcons.chevronDown),
-                      ),
-                      const SizedBox(width: 15),
-                      GlassAnim(
-                        animationDirection: Axis.horizontal,
-                        child: AppBarMain(
-                          pageNotifier: pageNotifier,
-                          children: MusicPlayerIconMap.musicPlayerIcons,
-                          requiredWidth: 50,
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      IconButton(
-                        onPressed: _openFullScreenPlayer,
-                        tooltip: 'Open fullscreen player',
-                        icon: const Icon(Icons.open_in_full),
-                      ),
-                      const SizedBox(width: 5),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+    return DefaultPlayerChrome(
+      width: width,
+      height: height,
+      musicQueState: widget.musicQueState,
+      onOpenMiniPlayer: _openMiniPlayer,
+      onOpenFullScreenPlayer: _openFullScreenPlayer,
+      pageNotifier: pageNotifier,
+      child: child,
     );
   }
 
   Widget _buildFullScreenPlayer(double width, double height) {
-    final trackState = widget.musicQueState.currentTrack!;
-
-    return SizedBox(
-      key: const ValueKey('fullscreen-player'),
+    return FullScreenPlayer(
       width: width,
       height: height,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          BackgroundProvider(trackState: trackState, isFullScreen: true),
-          FullscreenPage(
-            musicQueState: widget.musicQueState,
-            playBackState: playbackState,
-            availableWidth: width,
-            availableHeight: height,
-          ),
-          Positioned(
-            top: 30,
-            right: 30,
-            child: IconButton(
-              onPressed: () => _openDefaultPlayer(initialPage: pageNotifier.value),
-              tooltip: 'Exit fullscreen',
-              icon: const Icon(Icons.close_fullscreen),
-            ),
-          ),
-        ],
-      ),
+      musicQueState: widget.musicQueState,
+      playbackState: playbackState,
+      onExitFullScreen: () =>
+          _openDefaultPlayer(initialPage: pageNotifier.value),
     );
   }
 
   Widget _buildAnimatedPlayer(Widget activePlayer) {
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 420),
-      curve: Curves.easeInOutCubic,
-      alignment: Alignment.center,
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 360),
-        switchInCurve: Curves.easeOutCubic,
-        switchOutCurve: Curves.easeInCubic,
-        layoutBuilder: (currentChild, previousChildren) {
-          return Stack(
-            alignment: Alignment.center,
-            children: [...previousChildren, if (currentChild != null) currentChild],
-          );
-        },
-        transitionBuilder: (child, animation) {
-          return FadeTransition(
-            opacity: animation,
-            child: SizeTransition(
-              sizeFactor: animation,
-              axis: Axis.horizontal,
-              axisAlignment: -1,
-              child: child,
-            ),
-          );
-        },
-        child: activePlayer,
-      ),
-    );
+    return AnimatedPlayer(activePlayer: activePlayer);
   }
 
   @override
